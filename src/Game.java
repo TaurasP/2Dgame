@@ -62,26 +62,27 @@ public class Game {
 
     private static void selectMap(Player player) {
         String userInput;
-        showMapsOptions();
+        boolean isFound = false;
 
+        showMapsOptions();
         userInput = readUserInputString();
 
         for (int i = 0; i < maps.size(); i++) {
             if (userInput.equalsIgnoreCase("B")) {
                 selectLevel(player);
-            } if (userInput.equalsIgnoreCase(String.valueOf(i))) {
+            } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
                 player.setMap(maps.get(i));
                 selectLevel(player);
-                System.out.println("Map selected: " + player.getMap().getName());
-            } else {
-                System.out.println("\nSelected number/letter does not exist.");
-                selectMap(player);
+                isFound = true;
             }
+        }
+        if(isFound == false) {
+            System.out.println("\nSelected number/letter does not exist.");
+            selectMap(player);
         }
     }
 
     public static void selectLevel(Player player) {
-        System.out.println("Selected map: " + player.getMap().getName());
         showLevelsOptions();
 
         switch (readUserInputChar()) {
@@ -155,7 +156,7 @@ public class Game {
 
     public static void showGameMenu() {
         System.out.println("\n---------------------------GAME MENU---------------------------");
-        System.out.println("1. MAP");
+        System.out.println("1. LOCATIONS");
         System.out.println("2. INVENTORY");
         System.out.println("3. ACHIEVEMENTS");
         System.out.println("---------------------------------------------------------------");
@@ -174,6 +175,8 @@ public class Game {
     }
 
     public static String readUserInputString() {
-        return scanner.nextLine().toUpperCase();
+        String userInput =  scanner.nextLine().toUpperCase();
+
+        return userInput;
     }
 }
