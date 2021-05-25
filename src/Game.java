@@ -84,7 +84,7 @@ public class Game {
                 isFound = true;
             }
         }
-        if(isFound == false) {
+        if(!isFound) {
             System.out.println("\nSelected number/letter does not exist.");
             selectMap(player);
         }
