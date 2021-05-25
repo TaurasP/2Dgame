@@ -1,7 +1,9 @@
+import java.util.List;
+
 public class Player extends BaseCharacter {
     private String name;
 
-    private Map map;
+    public Map map;
 
     public Player() {
         type = "Player";

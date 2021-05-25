@@ -14,6 +14,10 @@ public class Game {
     public static List<Map> maps = new ArrayList<>();
     public static Map map1 = new Map("Lietuva");
     public static Map map2 = new Map("Latvija");
+    public static Location location1 = new Location("Vilnius");
+    public static Location location2 = new Location("Klaipeda");
+    public static Location location3 = new Location("Ryga");
+    public static Location location4 = new Location("Ventspils");
 
     public static String getLevel() {
         return level;
@@ -23,6 +27,10 @@ public class Game {
         level = EASY_LEVEL;
         maps.add(map1);
         maps.add(map2);
+        map1.locations.add(location1);
+        map1.locations.add(location2);
+        map2.locations.add(location3);
+        map2.locations.add(location4);
     }
 
     public static void start(Player player) {
@@ -62,26 +70,27 @@ public class Game {
 
     private static void selectMap(Player player) {
         String userInput;
-        showMapsOptions();
+        boolean isFound = false;
 
+        showMapsOptions();
         userInput = readUserInputString();
 
         for (int i = 0; i < maps.size(); i++) {
             if (userInput.equalsIgnoreCase("B")) {
                 selectLevel(player);
-            } if (userInput.equalsIgnoreCase(String.valueOf(i))) {
+            } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
                 player.setMap(maps.get(i));
                 selectLevel(player);
-                System.out.println("Map selected: " + player.getMap().getName());
-            } else {
-                System.out.println("\nSelected number/letter does not exist.");
-                selectMap(player);
+                isFound = true;
             }
+        }
+        if(isFound == false) {
+            System.out.println("\nSelected number/letter does not exist.");
+            selectMap(player);
         }
     }
 
     public static void selectLevel(Player player) {
-        System.out.println("Selected map: " + player.getMap().getName());
         showLevelsOptions();
 
         switch (readUserInputChar()) {
@@ -113,6 +122,18 @@ public class Game {
     private static void enterPlayerName(Player player) {
         System.out.print("Enter player's name: ");
         player.setName(readUserInputString());
+
+        // TESTING DATA - START
+        System.out.println("\nSelected map: " + player.getMap().getName());
+
+        for(Location l : player.getMap().locations) {
+            System.out.println("Location: " + l.getName());
+        }
+
+        System.out.println("Selected level: " + getLevel());
+
+        System.out.println("Player's name: " + player.getName());
+        // END
     }
 
     public static void showStartMenu() {
@@ -155,7 +176,7 @@ public class Game {
 
     public static void showGameMenu() {
         System.out.println("\n---------------------------GAME MENU---------------------------");
-        System.out.println("1. MAP");
+        System.out.println("1. LOCATIONS");
         System.out.println("2. INVENTORY");
         System.out.println("3. ACHIEVEMENTS");
         System.out.println("---------------------------------------------------------------");
@@ -174,6 +195,8 @@ public class Game {
     }
 
     public static String readUserInputString() {
-        return scanner.nextLine().toUpperCase();
+        String userInput =  scanner.nextLine().toUpperCase();
+
+        return userInput;
     }
 }
