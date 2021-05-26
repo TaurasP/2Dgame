@@ -12,7 +12,8 @@ public class Player extends BaseCharacter {
         type = "Player";
         lifePoints = 100;
         armorPoints = 0;
-        damagePoints = 10;
+        damagePoints = 20;
+        boolean isAlive;
         achievements = new ArrayList<>();
     }
 
@@ -21,7 +22,8 @@ public class Player extends BaseCharacter {
         type = "Player";
         lifePoints = 100;
         armorPoints = 0;
-        damagePoints = 10;
+        damagePoints = 20;
+        boolean isAlive;
         achievements = new ArrayList<>();
     }
 

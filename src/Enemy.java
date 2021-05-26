@@ -1,8 +1,9 @@
 public class Enemy extends BaseCharacter {
     public Enemy() {
         type = "Enemy";
-        lifePoints = 50;
+        lifePoints = 20;
         armorPoints = 0;
-        damagePoints = 10;
+        damagePoints = 5;
+        boolean isAlive;
     }
 }

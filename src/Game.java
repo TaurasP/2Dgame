@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Game {
@@ -30,6 +31,18 @@ public class Game {
         return level;
     }
 
+    // sutvarkyti, kai sukasi ciklas - kaskart nauja skaiciu sugeneruoti skirtingoms lokacijoms
+    public static void generateEnemies(Location location) {
+        int minEnemies = 1;
+        int maxEnemies = 3;
+        Random random = new Random();
+        int numberOfEnemies = random.nextInt(maxEnemies) + minEnemies;
+
+        for (int i = 0; i < numberOfEnemies; i++) {
+            location.enemies.add(new Enemy());
+        }
+    }
+
     public Game() {
         level = EASY_LEVEL;
         maps.add(map1);
@@ -43,6 +56,10 @@ public class Game {
     public static void start(Player player) {
         player.achievements.add(achievement1);
         player.achievements.add(achievement2);
+        generateEnemies(location1);
+        generateEnemies(location2);
+        generateEnemies(location3);
+        generateEnemies(location4);
 
         boolean exit = false;
 
@@ -186,10 +203,12 @@ public class Game {
 
         for (int i = 0; i < player.getMap().locations.size(); i++) {
             if (userInput.equalsIgnoreCase("B")) {
-                showGameMenu();
+                selectFromGameMenu(player);
+                isSelected = true;
+
             } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
                 player.getMap().setLastLocation(player.getMap().locations.get(i));
-                //show Enemies method
+                attackEnemy(player);
 
                 isSelected = true;
             }
@@ -202,17 +221,86 @@ public class Game {
 
     private static void selectInventory(Player player) {
         // showInventory method
-        // switch cases
+        // switch cases / if statements
+    }
+
+    private static void attackEnemy(Player player) {
+        String userInput;
+        int selectedEnemyIndex;
+        boolean isSelected = false;
+
+        showEnemies(player);
+
+        userInput = readUserInputString();
+
+        for (int i = 0; i < player.getMap().getLastLocation().enemies.size(); i++) {
+            if (userInput.equalsIgnoreCase("B")) {
+                selectLocation(player);
+            } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
+                selectedEnemyIndex = i;
+                attack(player, selectedEnemyIndex);
+
+                attackEnemy(player);
+                isSelected = true;
+            }
+        }
+        if(!isSelected) {
+            System.out.println("\nSelected number/letter does not exist.");
+            attackEnemy(player);
+        }
+    }
+
+    public static void attack(Player player, int selectedEnemyIndex) {
+        Enemy enemy = player.getMap().getLastLocation().enemies.get(selectedEnemyIndex);
+
+        if(enemy.isAlive) {
+            if (player.lifePoints > enemy.damagePoints) {
+                enemy.lifePoints = enemy.lifePoints - player.damagePoints;
+                player.lifePoints = player.lifePoints - enemy.damagePoints;
+
+                if (enemy.lifePoints > 0) {
+                    System.out.println(enemy.type + " has " + enemy.lifePoints + " life points left.");
+                    System.out.println("You have " + player.lifePoints + " life points left.");
+                }
+
+                if (enemy.lifePoints <= 0) {
+                    System.out.println(enemy.type + " has 0 life points left. He is dead.");
+                    enemy.isAlive = false;
+                    player.getMap().getLastLocation().enemies.remove(selectedEnemyIndex);
+                    System.out.println("You have " + player.lifePoints + " life points left.");
+
+                    if (player.getMap().getLastLocation().enemies.isEmpty()) {
+                        for (int i = 0; i < player.getMap().locations.size(); i++) {
+
+                            if (player.getMap().getLastLocation() == player.getMap().locations.get(i)) {
+                                player.getMap().locations.remove(i);
+                            }
+                        }
+                    }
+                }
+        } else {
+                System.out.println("You cannot attack selected enemy. You have not enough life points.");
+            }
+        } else {
+            System.out.println(player.type + " is already dead. You cannot attack.");
+        }
     }
 
     private static void showLocations(Player player) {
         System.out.println("\n--------------------------LOCATIONS--------------------------");
-        for (int i = 0; i < player.getMap().locations.size(); i++) {
-            System.out.println(i + ". " + player.getMap().locations.get(i).getName().toUpperCase());
+        if (player.getMap().locations.size() > 0) {
+            for (int i = 0; i < player.getMap().locations.size(); i++) {
+                System.out.println(i + ". " + player.getMap().locations.get(i).getName().toUpperCase());
+            }
+            System.out.println("-------------------------------------------------------------");
+            System.out.println("B. BACK");
+            System.out.println("-------------------------------------------------------------");
+        } else {
+            System.out.println("All locations are clear. No more enemies left.");
+            System.out.println("Congratulations! You passed the game.");
+            // Give achievement or increment some flag to earn achievement later
+            showStartMenu();
         }
-        System.out.println("\n-------------------------------------------------------------");
-        System.out.println("B. BACK");
-        System.out.println("\n-------------------------------------------------------------");
     }
 
     private static void showAchievements(Player player) {
@@ -226,12 +314,35 @@ public class Game {
 
         switch (readUserInputChar()) {
             case 'B':
-                showGameMenu();
+                selectFromGameMenu(player);
                 break;
             default:
                 System.out.println("\nSelected number/letter does not exist.");
                 showAchievements(player);
                 break;
+        }
+    }
+
+    public static void showEnemies(Player player) {
+        System.out.println("\n--------------------------ENEMIES--------------------------");
+        if (player.getMap().getLastLocation().enemies.size() > 0) {
+            for (int i = 0; i < player.getMap().getLastLocation().enemies.size(); i++) {
+                if(player.getMap().getLastLocation().enemies.get(i).isAlive) {
+                    System.out.println(i + ". Enemy life points: " + player.getMap().getLastLocation().enemies.get(i).getLifePoints() + ", damage points: " + player.getMap().getLastLocation().enemies.get(i).getDamagePoints() + ".");
+                } else {
+                    player.getMap().getLastLocation().enemies.remove(i);
+                }
+            }
+            System.out.println("-----------------------------------------------------------");
+            // shop selection option implementation
+            System.out.println("B. BACK");
+            System.out.println("-----------------------------------------------------------");
+
+            System.out.print("Choose number/letter:");
+        } else {
+            System.out.println("Location is clear. No more enemies left.");
+            // Give achievement or increment some flag to earn achievement later
+            selectLocation(player);
         }
     }
 
@@ -297,4 +408,11 @@ public class Game {
 
         return userInput;
     }
+
+    /*public static int readUserInputInt() {
+        int userInput =  scanner.nextInt();
+        scanner.nextLine();
+
+        return userInput;
+    }*/
 }
