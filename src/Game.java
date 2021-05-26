@@ -11,9 +11,16 @@ public class Game {
 
     private static String level;
 
+    //public static List<Achievement> achievements = new ArrayList<>();
+
+    public static Achievement achievement1 = new Achievement("New player.");
+    public static Achievement achievement2 = new Achievement("5 enemies killed.");
+
     public static List<Map> maps = new ArrayList<>();
+
     public static Map map1 = new Map("Lietuva");
     public static Map map2 = new Map("Latvija");
+
     public static Location location1 = new Location("Vilnius");
     public static Location location2 = new Location("Klaipeda");
     public static Location location3 = new Location("Ryga");
@@ -34,6 +41,8 @@ public class Game {
     }
 
     public static void start(Player player) {
+        player.achievements.add(achievement1);
+        player.achievements.add(achievement2);
 
         boolean exit = false;
 
@@ -97,20 +106,23 @@ public class Game {
             case '1':
                 level = EASY_LEVEL;
                 enterPlayerName(player);
-                showGameMenu();
+                //showGameMenu();
                 break;
             case '2':
                 level = MEDIUM_LEVEL;
                 enterPlayerName(player);
-                showGameMenu();
+                //showGameMenu();
                 break;
             case '3':
                 level = HARD_LEVEL;
                 enterPlayerName(player);
-                showGameMenu();
+                //showGameMenu();
                 break;
             case 'B':
                 selectMap(player);
+                break;
+            case 'M':
+                showStartMenu();
                 break;
             default:
                 System.out.println("\nSelected number/letter does not exist.");
@@ -124,7 +136,7 @@ public class Game {
         player.setName(readUserInputString());
 
         // TESTING DATA - START
-        System.out.println("\nSelected map: " + player.getMap().getName());
+        /*System.out.println("\nSelected map: " + player.getMap().getName());
 
         for(Location l : player.getMap().locations) {
             System.out.println("Location: " + l.getName());
@@ -132,8 +144,95 @@ public class Game {
 
         System.out.println("Selected level: " + getLevel());
 
-        System.out.println("Player's name: " + player.getName());
+        System.out.println("Player's name: " + player.getName());*/
         // END
+
+        selectFromGameMenu(player);
+    }
+
+    private static void selectFromGameMenu(Player player) {
+        showGameMenu();
+
+        switch (readUserInputChar()) {
+            case '1':
+                selectLocation(player);
+                break;
+            case '2':
+                selectInventory(player);
+                break;
+            case '3':
+                showAchievements(player);
+                break;
+            case 'M':
+                showStartMenu();
+                break;
+            /*case 'E':
+                exit = true;
+                break;*/
+            default:
+                System.out.println("\nSelected number/letter does not exist.");
+                selectFromGameMenu(player);
+                break;
+        }
+    }
+
+    private static void selectLocation(Player player) {
+        String userInput;
+        boolean isSelected = false;
+
+        showLocations(player);
+
+        userInput = readUserInputString();
+
+        for (int i = 0; i < player.getMap().locations.size(); i++) {
+            if (userInput.equalsIgnoreCase("B")) {
+                showGameMenu();
+            } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
+                player.getMap().setLastLocation(player.getMap().locations.get(i));
+                //show Enemies method
+
+                isSelected = true;
+            }
+        }
+        if(!isSelected) {
+            System.out.println("\nSelected number/letter does not exist.");
+            selectLocation(player);
+        }
+    }
+
+    private static void selectInventory(Player player) {
+        // showInventory method
+        // switch cases
+    }
+
+    private static void showLocations(Player player) {
+        System.out.println("\n--------------------------LOCATIONS--------------------------");
+        for (int i = 0; i < player.getMap().locations.size(); i++) {
+            System.out.println(i + ". " + player.getMap().locations.get(i).getName().toUpperCase());
+        }
+        System.out.println("\n-------------------------------------------------------------");
+        System.out.println("B. BACK");
+        System.out.println("\n-------------------------------------------------------------");
+    }
+
+    private static void showAchievements(Player player) {
+        System.out.println("\n--------------------------ACHIEVEMENTS--------------------------");
+        for (int i = 0; i < player.getAchievements().size(); i++) {
+            System.out.println(i + 1 + ". " + player.getAchievements().get(i).getName().toUpperCase());
+        }
+        System.out.println("----------------------------------------------------------------");
+        System.out.println("B. BACK");
+        System.out.println("----------------------------------------------------------------");
+
+        switch (readUserInputChar()) {
+            case 'B':
+                showGameMenu();
+                break;
+            default:
+                System.out.println("\nSelected number/letter does not exist.");
+                showAchievements(player);
+                break;
+        }
     }
 
     public static void showStartMenu() {
@@ -153,7 +252,6 @@ public class Game {
         for (int i = 0; i < maps.size(); i++) {
             System.out.println(i + ". " + maps.get(i).getName().toUpperCase());
         }
-
         System.out.println("------------------------------------------------------------");
         System.out.println("B. BACK");
         System.out.println("------------------------------------------------------------");
@@ -168,7 +266,7 @@ public class Game {
         System.out.println("3. HARD");
         System.out.println("------------------------------------------------------------");
         System.out.println("B. BACK");
-        System.out.println("E. EXIT GAME");
+        System.out.println("M. BACK TO START MENU");
         System.out.println("------------------------------------------------------------");
 
         System.out.print("Choose number/letter:");
