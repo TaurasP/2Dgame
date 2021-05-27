@@ -1,14 +1,16 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
 
 public class Game {
 
-    private static final Scanner scanner = new Scanner(System.in);
+    private static final Scanner SCANNER = new Scanner(System.in);
     private static final String EASY_LEVEL = "EASY";
     private static final String MEDIUM_LEVEL = "MEDIUM";
     private static final String HARD_LEVEL = "HARD";
+    private static final int ENEMIES_EASY_LEVEL = 2;
+    private static final int ENEMIES_MEDIUM_LEVEL = 4;
+    private static final int ENEMIES_HARD_LEVEL = 6;
 
     private static String level;
 
@@ -27,19 +29,26 @@ public class Game {
     public static Location location3 = new Location("Ryga");
     public static Location location4 = new Location("Ventspils");
 
-    public static String getLevel() {
-        return level;
+    public static int getEnemiesNumberFromLevel() {
+        int enemiesNumber = 0;
+
+        if(level == EASY_LEVEL) {
+            enemiesNumber = ENEMIES_EASY_LEVEL;
+        } else if(level == MEDIUM_LEVEL) {
+            enemiesNumber = ENEMIES_MEDIUM_LEVEL;
+        } else if (level == HARD_LEVEL) {
+            enemiesNumber = ENEMIES_HARD_LEVEL;
+        }
+        return enemiesNumber;
     }
 
-    // sutvarkyti, kai sukasi ciklas - kaskart nauja skaiciu sugeneruoti skirtingoms lokacijoms
-    public static void generateEnemies(Location location) {
-        int minEnemies = 1;
-        int maxEnemies = 3;
-        Random random = new Random();
-        int numberOfEnemies = random.nextInt(maxEnemies) + minEnemies;
-
-        for (int i = 0; i < numberOfEnemies; i++) {
-            location.enemies.add(new Enemy());
+    public static void generateEnemies() {
+        for (int i = 0; i < maps.size(); i++) {
+            for (int j = 0; j < maps.get(i).locations.size(); j++) {
+                for (int k = 0; k < getEnemiesNumberFromLevel(); k++) {
+                    maps.get(i).locations.get(j).enemies.add(new Enemy());
+                }
+            }
         }
     }
 
@@ -56,10 +65,6 @@ public class Game {
     public static void start(Player player) {
         player.achievements.add(achievement1);
         player.achievements.add(achievement2);
-        generateEnemies(location1);
-        generateEnemies(location2);
-        generateEnemies(location3);
-        generateEnemies(location4);
 
         boolean exit = false;
 
@@ -164,6 +169,7 @@ public class Game {
         System.out.println("Player's name: " + player.getName());*/
         // END
 
+        generateEnemies();
         selectFromGameMenu(player);
     }
 
@@ -397,14 +403,14 @@ public class Game {
     }
 
     public static char readUserInputChar() {
-        char userInput = Character.toUpperCase(scanner.next().charAt(0));
-        scanner.nextLine();
+        char userInput = Character.toUpperCase(SCANNER.next().charAt(0));
+        SCANNER.nextLine();
 
         return userInput;
     }
 
     public static String readUserInputString() {
-        String userInput =  scanner.nextLine().toUpperCase();
+        String userInput =  SCANNER.nextLine().toUpperCase();
 
         return userInput;
     }

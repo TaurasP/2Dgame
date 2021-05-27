@@ -4,7 +4,7 @@ import java.util.List;
 public class Location {
     private String name;
 
-    public static List<Enemy> enemies;
+    public List<Enemy> enemies = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -12,6 +12,5 @@ public class Location {
 
     public Location(String name) {
         this.name = name;
-        enemies = new ArrayList<>();
     }
 }
