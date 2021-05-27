@@ -5,6 +5,9 @@ import java.util.Scanner;
 public class Game {
 
     private static final Scanner SCANNER = new Scanner(System.in);
+    public static final String WEAPON = "Weapon";
+    public static final String ARMOR = "Armor";
+    public static final String POTION = "Potion";
     private static final String EASY_LEVEL = "EASY";
     private static final String MEDIUM_LEVEL = "MEDIUM";
     private static final String HARD_LEVEL = "HARD";
@@ -63,8 +66,8 @@ public class Game {
     }
 
     public static void start(Player player) {
-        player.achievements.add(achievement1);
-        player.achievements.add(achievement2);
+        player.achievementsList.add(achievement1);
+        player.achievementsList.add(achievement2);
 
         boolean exit = false;
 
@@ -226,8 +229,68 @@ public class Game {
     }
 
     private static void selectInventory(Player player) {
-        // showInventory method
-        // switch cases / if statements
+        showInventory();
+
+        switch (readUserInputChar()) {
+            case '1':
+                selectItem(player, WEAPON);
+                break;
+            case '2':
+                selectItem(player, ARMOR);
+                break;
+            case '3':
+                selectItem(player, POTION);
+                break;
+            case 'B':
+                selectFromGameMenu(player);
+                break;
+            default:
+                System.out.println("\nSelected number/letter does not exist.");
+                selectInventory(player);
+                break;
+        }
+    }
+
+    // not finished
+    public static void selectItem(Player player, String itemType) {
+        String userInput;
+        boolean isSelected = false;
+
+        showItems(player, itemType);
+        List<Item> selectedItemList = getItemList(player, itemType);
+
+        userInput = readUserInputString();
+
+        for (int i = 0; i < selectedItemList.size(); i++) {
+            if (userInput.equalsIgnoreCase("B")) {
+                selectInventory(player);
+                isSelected = true;
+
+            } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
+                System.out.println("1. EQUIP");
+                System.out.println("2. SELL");
+                System.out.println("B. BACK");
+                //show options: equip, sell, back
+
+                isSelected = true;
+            }
+        }
+        if(!isSelected) {
+            System.out.println("\nSelected number/letter does not exist.");
+            selectItem(player, itemType);
+        }
+    }
+
+    public static List<Item> getItemList(Player player, String type) {
+        List<Item> itemList = new ArrayList<>();
+        if(type.equalsIgnoreCase(WEAPON)) {
+            itemList = player.weaponsList;
+        } else if(type.equalsIgnoreCase(ARMOR)) {
+            itemList = player.armorList;
+        } else if(type.equalsIgnoreCase(POTION)) {
+            itemList = player.potionsList;
+        }
+        return itemList;
     }
 
     private static void attackEnemy(Player player) {
@@ -305,14 +368,17 @@ public class Game {
             System.out.println("All locations are clear. No more enemies left.");
             System.out.println("Congratulations! You passed the game.");
             // Give achievement or increment some flag to earn achievement later
+            // Save data, think of scoring system, put player to high score leaderboard, reset his life points, gold, weapons, armor, potions. Anything else?
+
+            // need to edit main while engine, export startmenu to separate method
             showStartMenu();
         }
     }
 
     private static void showAchievements(Player player) {
         System.out.println("\n--------------------------ACHIEVEMENTS--------------------------");
-        for (int i = 0; i < player.getAchievements().size(); i++) {
-            System.out.println(i + 1 + ". " + player.getAchievements().get(i).getName().toUpperCase());
+        for (int i = 0; i < player.achievementsList.size(); i++) {
+            System.out.println(i + 1 + ". " + player.achievementsList.get(i).getName().toUpperCase());
         }
         System.out.println("----------------------------------------------------------------");
         System.out.println("B. BACK");
@@ -350,6 +416,42 @@ public class Game {
             // Give achievement or increment some flag to earn achievement later
             selectLocation(player);
         }
+    }
+
+    public static void showInventory() {
+        System.out.println("\n---------------------------INVENTORY---------------------------");
+        System.out.println("1. WEAPONS");
+        System.out.println("2. ARMOR");
+        System.out.println("3. POTIONS");
+        System.out.println("---------------------------------------------------------------");
+        System.out.println("B. BACK");
+        System.out.println("---------------------------------------------------------------");
+
+        System.out.print("Choose number/letter:");
+    }
+
+    public static void showItems(Player player, String type) {
+        if(type.equalsIgnoreCase(WEAPON)) {
+            System.out.println("\n---------------------------WEAPONS---------------------------");
+            for (int i = 0; i < player.weaponsList.size(); i++) {
+                System.out.println(i + ". " + player.weaponsList.get(i).getName().toUpperCase() + " (price: " + player.weaponsList.get(i).getPrice() + ").");
+            }
+        } else if(type.equalsIgnoreCase(ARMOR)) {
+            System.out.println("\n---------------------------ARMOR---------------------------");
+            for (int i = 0; i < player.armorList.size(); i++) {
+                System.out.println(i + ". " + player.armorList.get(i).getName().toUpperCase() + " (price: " + player.armorList.get(i).getPrice() + ").");
+            }
+        } else if(type.equalsIgnoreCase(POTION)) {
+            System.out.println("\n---------------------------POTIONS---------------------------");
+            for (int i = 0; i < player.potionsList.size(); i++) {
+                System.out.println(i + ". " + player.potionsList.get(i).getName().toUpperCase() + " (price: " + player.potionsList.get(i).getPrice() + ").");
+            }
+        }
+        System.out.println("------------------------------------------------------------");
+        System.out.println("B. BACK");
+        System.out.println("------------------------------------------------------------");
+
+        System.out.print("Choose number/letter:");
     }
 
     public static void showStartMenu() {
@@ -410,7 +512,7 @@ public class Game {
     }
 
     public static String readUserInputString() {
-        String userInput =  SCANNER.nextLine().toUpperCase();
+        String userInput = SCANNER.nextLine().toUpperCase();
 
         return userInput;
     }
