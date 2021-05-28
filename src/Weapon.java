@@ -4,5 +4,6 @@ public class Weapon extends Item{
         this.type = Game.WEAPON;
         this.price = price;
         this.damage = damage;
+        this.isEquipped = false;
     }
 }

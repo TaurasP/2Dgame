@@ -4,5 +4,6 @@ public class Armor extends Item{
         this.type = Game.ARMOR;
         this.price = price;
         this.armor = armor;
+        this.isEquipped = false;
     }
 }

@@ -32,6 +32,8 @@ public class Game {
     public static Location location3 = new Location("Ryga");
     public static Location location4 = new Location("Ventspils");
 
+    public static Shop shop = new Shop();
+
     public static int getEnemiesNumberFromLevel() {
         int enemiesNumber = 0;
 
@@ -160,6 +162,7 @@ public class Game {
         System.out.print("Enter player's name: ");
         player.setName(readUserInputString());
 
+        equipStartingItems(player);
         generateEnemies();
         selectFromGameMenu(player);
     }
@@ -175,6 +178,9 @@ public class Game {
                 selectInventory(player);
                 break;
             case '3':
+                selectShop(player);
+                break;
+            case '4':
                 showAchievements(player);
                 break;
             case 'M':
@@ -217,17 +223,17 @@ public class Game {
     }
 
     private static void selectInventory(Player player) {
-        showInventory();
+        showInventoryOptions();
 
         switch (readUserInputChar()) {
             case '1':
-                selectItem(player, WEAPON);
+                selectInventoryItem(player, WEAPON);
                 break;
             case '2':
-                selectItem(player, ARMOR);
+                selectInventoryItem(player, ARMOR);
                 break;
             case '3':
-                selectItem(player, POTION);
+                selectInventoryItem(player, POTION);
                 break;
             case 'B':
                 selectFromGameMenu(player);
@@ -239,14 +245,14 @@ public class Game {
         }
     }
 
-    public static void selectItem(Player player, String itemType) {
+    public static void selectInventoryItem(Player player, String itemType) {
         String userInput;
         boolean isSelected = false;
         Item selectedItem;
 
-        showItems(player, itemType);
+        showInventoryItems(player, itemType);
 
-        List<Item> selectedItemList = getSelectedItemList(player, itemType);
+        List<Item> selectedItemList = getSelectedPlayerItemList(player, itemType);
 
         userInput = readUserInputString();
 
@@ -257,41 +263,133 @@ public class Game {
 
             } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
                 selectedItem = selectedItemList.get(i);
-                selectItemAction(player, itemType, selectedItem);
+                selectInventoryItemAction(player, itemType, selectedItem);
 
                 isSelected = true;
             }
         }
         if(!isSelected) {
             System.out.println("\nSelected number/letter does not exist.");
-            selectItem(player, itemType);
+            selectInventoryItem(player, itemType);
         }
     }
 
-    public static void selectItemAction(Player player, String itemType, Item item) {
-        showItemAction(item);
+    public static void selectInventoryItemAction(Player player, String itemType, Item item) {
+        showInventoryItemAction(item);
 
         switch (readUserInputChar()) {
             case '1':
                 // EQUIP
                 equipItem(player, item);
-                selectItem(player, itemType);
+                selectInventoryItem(player, itemType);
                 break;
             case '2':
                 // SELL
                 sellItem(player, item);
-                selectItem(player, itemType);
+                selectInventoryItem(player, itemType);
                 break;
             case 'B':
                 // BACK
-                selectItem(player, itemType);
+                selectInventoryItem(player, itemType);
                 break;
             default:
                 System.out.println("\nSelected number/letter does not exist.");
-                selectItemAction(player, itemType, item);
+                selectInventoryItemAction(player, itemType, item);
                 break;
         }
     }
+
+    private static void selectShop(Player player) {
+        showShopOptions(player);
+
+        switch (readUserInputChar()) {
+            case '1':
+                selectShopItem(player, WEAPON);
+                break;
+            case '2':
+                selectShopItem(player, ARMOR);
+                break;
+            case '3':
+                selectShopItem(player, POTION);
+                break;
+            case 'B':
+                selectFromGameMenu(player);
+                break;
+            default:
+                System.out.println("\nSelected number/letter does not exist.");
+                selectShop(player);
+                break;
+        }
+    }
+
+    public static void selectShopItem(Player player, String itemType) {
+        String userInput;
+        boolean isSelected = false;
+        Item selectedItem;
+
+        showShopItems(player, itemType);
+
+        List<Item> selectedItemList = getSelectedShopItemList(player, itemType);
+
+        userInput = readUserInputString();
+
+        for (int i = 0; i < selectedItemList.size(); i++) {
+            if (userInput.equalsIgnoreCase("B")) {
+                selectShop(player);
+                isSelected = true;
+            } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
+                if(itemType == WEAPON || itemType == ARMOR) {
+                    selectedItem = selectedItemList.get(i);
+                    buyItem(player, selectedItem);
+                } else if(itemType == POTION) {
+                    switch (userInput) {
+                        case "1":
+                            buyItem(player, shop.potion25);
+                            break;
+                        case "2":
+                            buyItem(player, shop.potion50);
+                            break;
+                        case "3":
+                            buyItem(player, shop.potion75);
+                            break;
+                        /*default:
+                            System.out.println("\nSelected number/letter does not exist.");
+                            break;*/
+                    }
+                }
+            }
+            isSelected = true;
+        }
+        if(!isSelected) {
+            System.out.println("\nSelected number/letter does not exist.");
+            selectShopItem(player, itemType);
+        }
+    }
+
+    /*public static void selectShopItemAction(Player player, String itemType, Item selectedItem) {
+        showShopItemAction(item);
+
+        switch (readUserInputChar()) {
+            case '1':
+                // EQUIP
+                equipItem(player, item);
+                selectInventoryItem(player, itemType);
+                break;
+            case '2':
+                // SELL
+                sellItem(player, item);
+                selectInventoryItem(player, itemType);
+                break;
+            case 'B':
+                // BACK
+                selectInventoryItem(player, itemType);
+                break;
+            default:
+                System.out.println("\nSelected number/letter does not exist.");
+                selectInventoryItemAction(player, itemType, item);
+                break;
+        }
+    }*/
 
     public static void equipItem(Player player, Item item) {
         if (!item.isEquipped) {
@@ -397,26 +495,45 @@ public class Game {
         }
     }
 
-    // use for shop
     public static void buyItem (Player player, Item item){
         if (player.gold >= item.price) {
             if (item.type == WEAPON) {
+                player.weaponsList.add(item);
                 item.isEquipped = false;
                 player.gold -= item.price;
             } else if (item.type == ARMOR) {
+                player.weaponsList.add(item);
                 item.isEquipped = false;
                 player.gold -= item.price;
             } else if (item.type == POTION) {
-                item.isEquipped = false;
                 player.gold -= item.price;
+                player.lifePoints += item.lifePoints;
             }
         } else {
             System.out.println("You don't have enough gold.");
         }
-
+        selectShopItem(player, item.type);
     }
 
-    public static List<Item> getSelectedItemList(Player player, String itemType) {
+    public static void equipStartingItems(Player player) {
+        Weapon dagger = new Weapon("Dagger", 100, 20);
+        Armor woodenShield = new Armor("Shield", 50, 5);
+
+        player.weaponsList.add(dagger);
+        dagger.setEquipped(true);
+        player.armorList.add(woodenShield);
+        woodenShield.setEquipped(true);
+
+        for (int i = 0; i < player.weaponsList.size(); i++) {
+            if(player.weaponsList.get(i).isEquipped) {
+                player.damagePoints += player.weaponsList.get(i).damage;
+            } else if(player.armorList.get(i).isEquipped) {
+                player.armorPoints += player.armorList.get(i).armor;
+            }
+        }
+    }
+
+    public static List<Item> getSelectedPlayerItemList(Player player, String itemType) {
         List<Item> itemList = new ArrayList<>();
 
         if(itemType.equalsIgnoreCase(WEAPON)) {
@@ -425,6 +542,19 @@ public class Game {
             itemList = player.armorList;
         } else if(itemType.equalsIgnoreCase(POTION)) {
             itemList = player.potionsList;
+        }
+        return itemList;
+    }
+
+    public static List<Item> getSelectedShopItemList(Player player, String itemType) {
+        List<Item> itemList = new ArrayList<>();
+
+        if(itemType.equalsIgnoreCase(WEAPON)) {
+            itemList = shop.weaponsListInShop;
+        } else if(itemType.equalsIgnoreCase(ARMOR)) {
+            itemList = shop.armorListInShop;
+        } else if(itemType.equalsIgnoreCase(POTION)) {
+            itemList = shop.potionsListInShop;
         }
         return itemList;
     }
@@ -459,6 +589,9 @@ public class Game {
         Enemy enemy = player.getMap().getLastLocation().enemies.get(selectedEnemyIndex);
 
         if(enemy.isAlive) {
+            System.out.println("You have " + player.gold + " gold | " + player.lifePoints + " life points");
+            System.out.println("-----------------------------------------------------------");
+
             if (player.lifePoints > enemy.damagePoints) {
                 enemy.lifePoints = enemy.lifePoints - player.damagePoints;
                 player.lifePoints = player.lifePoints - enemy.damagePoints;
@@ -493,6 +626,7 @@ public class Game {
 
     private static void showLocations(Player player) {
         System.out.println("\n--------------------------LOCATIONS--------------------------");
+        showPlayerLPAndGold(player);
         if (player.getMap().locations.size() > 0) {
             for (int i = 0; i < player.getMap().locations.size(); i++) {
                 System.out.println(i + ". " + player.getMap().locations.get(i).getName().toUpperCase());
@@ -502,7 +636,7 @@ public class Game {
             System.out.println("-------------------------------------------------------------");
         } else {
             System.out.println("All locations are clear. No more enemies left.");
-            System.out.println("Congratulations! You passed the game.");
+            System.out.println("Victory! You won the game!");
             // Give achievement or increment some flag to earn achievement later
             // Save data, think of scoring system, put player to high score leaderboard, reset his life points, gold, weapons, armor, potions. Anything else?
 
@@ -533,10 +667,12 @@ public class Game {
 
     public static void showEnemies(Player player) {
         System.out.println("\n--------------------------ENEMIES--------------------------");
+        showPlayerLPAndGold(player);
+
         if (player.getMap().getLastLocation().enemies.size() > 0) {
             for (int i = 0; i < player.getMap().getLastLocation().enemies.size(); i++) {
                 if(player.getMap().getLastLocation().enemies.get(i).isAlive) {
-                    System.out.println(i + ". Enemy life points: " + player.getMap().getLastLocation().enemies.get(i).getLifePoints() + ", damage points: " + player.getMap().getLastLocation().enemies.get(i).getDamagePoints() + ".");
+                    System.out.println(i + ". Enemy | life points: " + player.getMap().getLastLocation().enemies.get(i).getLifePoints() + " | damage points: " + player.getMap().getLastLocation().enemies.get(i).getDamagePoints());
                 } else {
                     player.getMap().getLastLocation().enemies.remove(i);
                 }
@@ -546,7 +682,7 @@ public class Game {
             System.out.println("B. BACK");
             System.out.println("-----------------------------------------------------------");
 
-            System.out.print("Choose number/letter:");
+            System.out.print("Choose a number to attack an enemy:");
         } else {
             System.out.println("Location is clear. No more enemies left.");
             // Give achievement or increment some flag to earn achievement later
@@ -554,8 +690,9 @@ public class Game {
         }
     }
 
-    public static void showInventory() {
+    public static void showInventoryOptions() {
         System.out.println("\n---------------------------INVENTORY---------------------------");
+        showPlayerLPAndGold(player);
         System.out.println("1. WEAPONS");
         System.out.println("2. ARMOR");
         System.out.println("3. POTIONS");
@@ -563,12 +700,13 @@ public class Game {
         System.out.println("B. BACK");
         System.out.println("---------------------------------------------------------------");
 
-        System.out.print("Choose number/letter:");
+        System.out.print("Choose a number to select an item:");
     }
 
-    public static void showItems(Player player, String itemType) {
+    public static void showInventoryItems(Player player, String itemType) {
         if(itemType.equalsIgnoreCase(WEAPON) && !player.weaponsList.isEmpty()) {
             System.out.println("\n---------------------------WEAPONS---------------------------");
+            showPlayerLPAndGold(player);
             for (int i = 0; i < player.weaponsList.size(); i++) {
                 if(player.weaponsList.get(i).isEquipped) {
                     System.out.println(i + ". " + player.weaponsList.get(i).getName().toUpperCase() + " | price: " + player.weaponsList.get(i).getPrice() + " | damage points: " + player.weaponsList.get(i).damage + " | (EQUIPPED)");
@@ -578,6 +716,7 @@ public class Game {
             }
         } else if(itemType.equalsIgnoreCase(ARMOR) && !player.armorList.isEmpty()) {
             System.out.println("\n---------------------------ARMOR---------------------------");
+            showPlayerLPAndGold(player);
             for (int i = 0; i < player.armorList.size(); i++) {
                 if(player.armorList.get(i).isEquipped) {
                     System.out.println(i + ". " + player.armorList.get(i).getName().toUpperCase() + " | price: " + player.armorList.get(i).getPrice() + " | armor points: " + player.armorList.get(i).armor + " | (EQUIPPED)");
@@ -587,16 +726,17 @@ public class Game {
             }
         } else if(itemType.equalsIgnoreCase(POTION) && !player.potionsList.isEmpty()) {
             System.out.println("\n---------------------------POTIONS---------------------------");
+            showPlayerLPAndGold(player);
             for (int i = 0; i < player.potionsList.size(); i++) {
                 System.out.println(i + ". " + player.potionsList.get(i).getName().toUpperCase() + " | price: " + player.potionsList.get(i).getPrice() + ").");
             }
         } else {
             if(itemType == WEAPON) {
-                System.out.println("You have 0 weapons left.");
+                System.out.println("You have 0 weapons.");
             } else if(itemType == ARMOR) {
-                System.out.println("You have 0 armor left.");
+                System.out.println("You have 0 armor.");
             } else if(itemType == POTION) {
-                System.out.println("You have 0 potions left.");
+                System.out.println("You have 0 potions.");
             }
             selectInventory(player);
         }
@@ -606,13 +746,101 @@ public class Game {
         System.out.println("------------------------------------------------------------");
 
         if(itemType == POTION) {
-            System.out.print("Choose number/letter to USE / SELL:");
+            System.out.print("Choose a number to USE / SELL a potion:");
         } else {
-            System.out.print("Choose number/letter to (UN)EQUIP / SELL:");
+            System.out.print("Choose a number to (UN)EQUIP / SELL an item:");
         }
     }
 
-    public static void showItemAction(Item item) {
+    public static void showShopOptions(Player player) {
+        System.out.println("\n---------------------------SHOP---------------------------");
+        showPlayerLPAndGold(player);
+        System.out.println("1. WEAPONS");
+        System.out.println("2. ARMOR");
+        System.out.println("3. POTIONS");
+        System.out.println("----------------------------------------------------------");
+        System.out.println("B. BACK");
+        System.out.println("----------------------------------------------------------");
+
+        System.out.print("Choose a number to select an item category:");
+    }
+
+    public static void showShopItems(Player player, String itemType) {
+        if(itemType.equalsIgnoreCase(WEAPON) && !shop.weaponsListInShop.isEmpty()) {
+            System.out.println("\n---------------------------WEAPONS---------------------------");
+            showPlayerLPAndGold(player);
+            for (int i = 0; i < shop.weaponsListInShop.size(); i++) {
+                System.out.println(i + ". " + shop.weaponsListInShop.get(i).getName().toUpperCase() + " | price: " + shop.weaponsListInShop.get(i).getPrice() + " | damage points: " + shop.weaponsListInShop.get(i).damage);
+            }
+        } else if(itemType.equalsIgnoreCase(ARMOR) && !shop.armorListInShop.isEmpty()) {
+            System.out.println("\n---------------------------ARMOR---------------------------");
+            showPlayerLPAndGold(player);
+            for (int i = 0; i < shop.armorListInShop.size(); i++) {
+                System.out.println(i + ". " + shop.armorListInShop.get(i).getName().toUpperCase() + " | price: " + shop.armorListInShop.get(i).getPrice() + " | armor points: " + shop.armorListInShop.get(i).armor);
+            }
+        } else if(itemType.equalsIgnoreCase(POTION) && !shop.potionsListInShop.isEmpty()) {
+            int potion25Counter = 0;
+            int potion50Counter = 0;
+            int potion75Counter = 0;
+
+            System.out.println("\n---------------------------POTIONS---------------------------");
+            showPlayerLPAndGold(player);
+            for (int i = 0; i < shop.potionsListInShop.size(); i++) {
+                if(shop.potionsListInShop.get(i).name.equals(Shop.POTION_25_LP)) {
+                    potion25Counter += 1;
+                }
+                if(shop.potionsListInShop.get(i).name.equals(Shop.POTION_50_LP)) {
+                    potion50Counter += 1;
+                }
+                if(shop.potionsListInShop.get(i).name.equals(Shop.POTION_75_LP)) {
+                    potion75Counter += 1;
+                }
+            }
+            if(potion25Counter >= 1) {
+                System.out.println("1. " + Shop.POTION_25_LP.toUpperCase() + " | price: " + Shop.potion25.getPrice() + " gold");
+            }
+            if(potion50Counter >= 1) {
+                System.out.println("2. " + Shop.POTION_50_LP.toUpperCase() + " | price: " + Shop.potion50.getPrice() + " gold");
+            }
+            if(potion75Counter >= 1) {
+                System.out.println("3. " + Shop.POTION_75_LP.toUpperCase() + " | price: " + Shop.potion75.getPrice() + " gold");
+            }
+        } else {
+            if(itemType == WEAPON) {
+                System.out.println("Sorry. 0 weapons left in the shop.");
+            }
+            if(itemType == ARMOR) {
+                System.out.println("Sorry. 0 armor left in the shop.");
+            }
+            if(itemType == POTION) {
+                System.out.println("Sorry. 0 potions left in the shop.");
+            }
+            selectInventory(player);
+        }
+
+        System.out.println("------------------------------------------------------------");
+        System.out.println("B. BACK");
+        System.out.println("------------------------------------------------------------");
+
+        System.out.print("Choose a number to buy an item:");
+    }
+
+    /*public static void showShopItemAction(Item item) {
+        System.out.println("\n---------------------------" + item.getName().toUpperCase() + "---------------------------");
+        System.out.println("1. BUY");
+        System.out.println("------------------------------------------------------------");
+        System.out.println("B. BACK");
+        System.out.println("------------------------------------------------------------");
+
+        System.out.print("Choose a number to make an action with an item:");
+    }*/
+
+    public static void showPlayerLPAndGold(Player player) {
+        System.out.println("You have: " + player.gold + " gold | " + player.lifePoints + " life points");
+        System.out.println("-----------------------------------------------------------");
+    }
+
+    public static void showInventoryItemAction(Item item) {
         System.out.println("\n---------------------------" + item.getName().toUpperCase() + "---------------------------");
         if(item.type == POTION) {
             System.out.println("1. USE");
@@ -624,7 +852,7 @@ public class Game {
         System.out.println("B. BACK");
         System.out.println("------------------------------------------------------------");
 
-        System.out.print("Choose number/letter:");
+        System.out.print("Choose a number to make an action with an item:");
     }
 
     public static void showStartMenu() {
@@ -636,7 +864,7 @@ public class Game {
         System.out.println("E. EXIT GAME");
         System.out.println("----------------------------------------------------------------");
 
-        System.out.print("Choose number/letter:");
+        System.out.print("Choose a number/letter:");
     }
 
     public static void showMapsOptions() {
@@ -648,7 +876,7 @@ public class Game {
         System.out.println("B. BACK");
         System.out.println("------------------------------------------------------------");
 
-        System.out.print("Choose number/letter:");
+        System.out.print("Choose a number to select a map:");
     }
 
     public static void showLevelsOptions() {
@@ -661,20 +889,21 @@ public class Game {
         System.out.println("M. BACK TO START MENU");
         System.out.println("------------------------------------------------------------");
 
-        System.out.print("Choose number/letter:");
+        System.out.print("Choose a number to select game difficulty level");
     }
 
     public static void showGameMenu() {
         System.out.println("\n---------------------------GAME MENU---------------------------");
         System.out.println("1. LOCATIONS");
         System.out.println("2. INVENTORY");
-        System.out.println("3. ACHIEVEMENTS");
+        System.out.println("3. SHOP");
+        System.out.println("4. ACHIEVEMENTS");
         System.out.println("---------------------------------------------------------------");
         System.out.println("M. GO TO START MENU");
         System.out.println("E. EXIT GAME");
         System.out.println("---------------------------------------------------------------");
 
-        System.out.print("Choose number/letter:");
+        System.out.print("Choose a number/letter:");
     }
 
     public static char readUserInputChar() {
@@ -689,11 +918,4 @@ public class Game {
 
         return userInput;
     }
-
-    /*public static int readUserInputInt() {
-        int userInput =  scanner.nextInt();
-        scanner.nextLine();
-
-        return userInput;
-    }*/
 }
