@@ -3,6 +3,9 @@ public class Item {
     String type;
     int price;
     boolean isEquipped;
+    int damage;
+    int armor;
+    int lifePoints;
 
     public String getName() {
         return name;
@@ -16,7 +19,23 @@ public class Item {
         return price;
     }
 
-    public boolean isEquipped() {
+    public boolean isEquipped(boolean b) {
         return isEquipped;
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
+
+    public int getLifePoints() {
+        return lifePoints;
+    }
+
+    public void setEquipped(boolean equipped) {
+        isEquipped = equipped;
     }
 }

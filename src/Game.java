@@ -160,18 +160,6 @@ public class Game {
         System.out.print("Enter player's name: ");
         player.setName(readUserInputString());
 
-        // TESTING DATA - START
-        /*System.out.println("\nSelected map: " + player.getMap().getName());
-
-        for(Location l : player.getMap().locations) {
-            System.out.println("Location: " + l.getName());
-        }
-
-        System.out.println("Selected level: " + getLevel());
-
-        System.out.println("Player's name: " + player.getName());*/
-        // END
-
         generateEnemies();
         selectFromGameMenu(player);
     }
@@ -251,13 +239,14 @@ public class Game {
         }
     }
 
-    // not finished
     public static void selectItem(Player player, String itemType) {
         String userInput;
         boolean isSelected = false;
+        Item selectedItem;
 
         showItems(player, itemType);
-        List<Item> selectedItemList = getItemList(player, itemType);
+
+        List<Item> selectedItemList = getSelectedItemList(player, itemType);
 
         userInput = readUserInputString();
 
@@ -267,10 +256,8 @@ public class Game {
                 isSelected = true;
 
             } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
-                System.out.println("1. EQUIP");
-                System.out.println("2. SELL");
-                System.out.println("B. BACK");
-                //show options: equip, sell, back
+                selectedItem = selectedItemList.get(i);
+                selectItemAction(player, itemType, selectedItem);
 
                 isSelected = true;
             }
@@ -281,13 +268,162 @@ public class Game {
         }
     }
 
-    public static List<Item> getItemList(Player player, String type) {
+    public static void selectItemAction(Player player, String itemType, Item item) {
+        showItemAction(item);
+
+        switch (readUserInputChar()) {
+            case '1':
+                // EQUIP
+                equipItem(player, item);
+                selectItem(player, itemType);
+                break;
+            case '2':
+                // SELL
+                sellItem(player, item);
+                selectItem(player, itemType);
+                break;
+            case 'B':
+                // BACK
+                selectItem(player, itemType);
+                break;
+            default:
+                System.out.println("\nSelected number/letter does not exist.");
+                selectItemAction(player, itemType, item);
+                break;
+        }
+    }
+
+    public static void equipItem(Player player, Item item) {
+        if (!item.isEquipped) {
+            if (isOtherItemEquipped(player, item)) {
+                if (item.type == WEAPON) {
+                    unequipEquippedItem(player, item);
+                    item.isEquipped = true;
+                    player.damagePoints += item.damage;
+                } else if (item.type == ARMOR) {
+                    unequipEquippedItem(player, item);
+                    item.isEquipped = true;
+                    player.armorPoints += item.armor;
+                }
+            } else {
+                if (item.type == WEAPON) {
+                    item.isEquipped = true;
+                    player.damagePoints += item.damage;
+                } else if (item.type == ARMOR) {
+                    item.isEquipped = true;
+                    player.armorPoints += item.armor;
+                }
+            }
+        } else {
+            System.out.println(item.name + " is already equipped.");
+        }
+
+        if (item.type == POTION) {
+            usePotion(player, item);
+        }
+    }
+
+    public static boolean isOtherItemEquipped(Player player, Item item) {
+        int counter = 0;
+
+        if(item.type == WEAPON) {
+            for (int i = 0; i < player.weaponsList.size(); i++) {
+                if(player.weaponsList.get(i).isEquipped) {
+                    counter += 1;
+                }
+            }
+        } else if(item.type == ARMOR) {
+            for (int i = 0; i < player.armorList.size(); i++) {
+                if(player.armorList.get(i).isEquipped) {
+                    counter += 1;
+                }
+            }
+        }
+
+        return counter == 1 ? true : false;
+    }
+
+    public static void unequipEquippedItem(Player player, Item item) {
+        if(item.type == WEAPON) {
+            for (int i = 0; i < player.weaponsList.size(); i++) {
+                if(player.weaponsList.get(i).isEquipped) {
+                    player.weaponsList.get(i).isEquipped = false;
+                }
+            }
+        } else if(item.type == ARMOR) {
+            for (int i = 0; i < player.armorList.size(); i++) {
+                if(player.armorList.get(i).isEquipped) {
+                    player.armorList.get(i).isEquipped = false;
+                }
+            }
+        }
+    }
+
+    public static void sellItem(Player player, Item item) {
+        if(item.type == WEAPON) {
+            for (int i = 0; i < player.weaponsList.size(); i++) {
+                if(player.weaponsList.get(i).getName() == item.name) {
+                    item.isEquipped = false;
+                    player.weaponsList.remove(i);
+                    player.damagePoints -= item.damage;
+                    player.gold += item.price;
+                }
+            }
+        } else if(item.type == ARMOR) {
+            for (int i = 0; i < player.armorList.size(); i++) {
+                if(player.armorList.get(i).getName() == item.name) {
+                    item.isEquipped = false;
+                    player.armorList.remove(i);
+                    player.armorPoints -= item.armor;
+                    player.gold += item.price;
+                }
+            }
+        } else if(item.type == POTION) {
+            for (int i = 0; i < player.potionsList.size(); i++) {
+                if(player.potionsList.get(i).getName() == item.name) {
+                    player.potionsList.remove(i);
+                    player.gold += item.price;
+                }
+            }
+        }
+    }
+
+    public static void usePotion(Player player, Item item) {
+        for (int i = 0; i < player.potionsList.size(); i++) {
+            if (player.potionsList.get(i).name == item.name) {
+                player.lifePoints += item.lifePoints;
+                player.potionsList.remove(i);
+            }
+        }
+    }
+
+    // use for shop
+    public static void buyItem (Player player, Item item){
+        if (player.gold >= item.price) {
+            if (item.type == WEAPON) {
+                item.isEquipped = false;
+                player.gold -= item.price;
+            } else if (item.type == ARMOR) {
+                item.isEquipped = false;
+                player.gold -= item.price;
+            } else if (item.type == POTION) {
+                item.isEquipped = false;
+                player.gold -= item.price;
+            }
+        } else {
+            System.out.println("You don't have enough gold.");
+        }
+
+    }
+
+    public static List<Item> getSelectedItemList(Player player, String itemType) {
         List<Item> itemList = new ArrayList<>();
-        if(type.equalsIgnoreCase(WEAPON)) {
+
+        if(itemType.equalsIgnoreCase(WEAPON)) {
             itemList = player.weaponsList;
-        } else if(type.equalsIgnoreCase(ARMOR)) {
+        } else if(itemType.equalsIgnoreCase(ARMOR)) {
             itemList = player.armorList;
-        } else if(type.equalsIgnoreCase(POTION)) {
+        } else if(itemType.equalsIgnoreCase(POTION)) {
             itemList = player.potionsList;
         }
         return itemList;
@@ -430,23 +566,60 @@ public class Game {
         System.out.print("Choose number/letter:");
     }
 
-    public static void showItems(Player player, String type) {
-        if(type.equalsIgnoreCase(WEAPON)) {
+    public static void showItems(Player player, String itemType) {
+        if(itemType.equalsIgnoreCase(WEAPON) && !player.weaponsList.isEmpty()) {
             System.out.println("\n---------------------------WEAPONS---------------------------");
             for (int i = 0; i < player.weaponsList.size(); i++) {
-                System.out.println(i + ". " + player.weaponsList.get(i).getName().toUpperCase() + " (price: " + player.weaponsList.get(i).getPrice() + ").");
+                if(player.weaponsList.get(i).isEquipped) {
+                    System.out.println(i + ". " + player.weaponsList.get(i).getName().toUpperCase() + " | price: " + player.weaponsList.get(i).getPrice() + " | damage points: " + player.weaponsList.get(i).damage + " | (EQUIPPED)");
+                } else{
+                    System.out.println(i + ". " + player.weaponsList.get(i).getName().toUpperCase() + " | price: " + player.weaponsList.get(i).getPrice() + " | damage points: " + player.weaponsList.get(i).damage);
+                }
             }
-        } else if(type.equalsIgnoreCase(ARMOR)) {
+        } else if(itemType.equalsIgnoreCase(ARMOR) && !player.armorList.isEmpty()) {
             System.out.println("\n---------------------------ARMOR---------------------------");
             for (int i = 0; i < player.armorList.size(); i++) {
-                System.out.println(i + ". " + player.armorList.get(i).getName().toUpperCase() + " (price: " + player.armorList.get(i).getPrice() + ").");
+                if(player.armorList.get(i).isEquipped) {
+                    System.out.println(i + ". " + player.armorList.get(i).getName().toUpperCase() + " | price: " + player.armorList.get(i).getPrice() + " | armor points: " + player.armorList.get(i).armor + " | (EQUIPPED)");
+                } else {
+                    System.out.println(i + ". " + player.armorList.get(i).getName().toUpperCase() + " | price: " + player.armorList.get(i).getPrice() + " | armor points: " + player.armorList.get(i).armor);
+                }
             }
-        } else if(type.equalsIgnoreCase(POTION)) {
+        } else if(itemType.equalsIgnoreCase(POTION) && !player.potionsList.isEmpty()) {
             System.out.println("\n---------------------------POTIONS---------------------------");
             for (int i = 0; i < player.potionsList.size(); i++) {
-                System.out.println(i + ". " + player.potionsList.get(i).getName().toUpperCase() + " (price: " + player.potionsList.get(i).getPrice() + ").");
+                System.out.println(i + ". " + player.potionsList.get(i).getName().toUpperCase() + " | price: " + player.potionsList.get(i).getPrice() + ").");
             }
+        } else {
+            if(itemType == WEAPON) {
+                System.out.println("You have 0 weapons left.");
+            } else if(itemType == ARMOR) {
+                System.out.println("You have 0 armor left.");
+            } else if(itemType == POTION) {
+                System.out.println("You have 0 potions left.");
+            }
+            selectInventory(player);
         }
+
+        System.out.println("------------------------------------------------------------");
+        System.out.println("B. BACK");
+        System.out.println("------------------------------------------------------------");
+
+        if(itemType == POTION) {
+            System.out.print("Choose number/letter to USE / SELL:");
+        } else {
+            System.out.print("Choose number/letter to (UN)EQUIP / SELL:");
+        }
+    }
+
+    public static void showItemAction(Item item) {
+        System.out.println("\n---------------------------" + item.getName().toUpperCase() + "---------------------------");
+        if(item.type == POTION) {
+            System.out.println("1. USE");
+        } else {
+            System.out.println("1. (UN)EQUIP");
+        }
+        System.out.println("2. SELL");
         System.out.println("------------------------------------------------------------");
         System.out.println("B. BACK");
         System.out.println("------------------------------------------------------------");

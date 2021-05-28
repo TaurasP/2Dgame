@@ -2,27 +2,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player extends BaseCharacter {
-    private String name;
-    int gold;
+
 
     public Map map;
     public static List<Achievement> achievementsList = new ArrayList<>();
     public static List<Item> weaponsList = new ArrayList<>();
     public static List<Item> armorList = new ArrayList<>();
     public static List<Item> potionsList = new ArrayList<>();
+    Weapon knife = new Weapon("Knife", 100, 20);
+    Weapon bow = new Weapon("Bow", 150, 20);
+    Armor shield = new Armor("Shield", 100, 5);
+    Armor helmet = new Armor("Helmet", 100, 5);
+    Potion potion50 = new Potion("50 life points", 50, 50);
+    Potion potion100 = new Potion("100 life points", 100, 100);
 
     public Player() {
         type = "Player";
         lifePoints = 100;
         armorPoints = 0;
         damagePoints = 20;
-        boolean isAlive;
-        weaponsList.add(new Weapon("Knife", 100, 20));
-        weaponsList.add(new Weapon("Arrow", 150, 25));
-        armorList.add(new Armor("Shield", 100, 5));
-        armorList.add(new Armor("Helmet", 100, 5));
-        potionsList.add(new Potion("100 life points", 100, 100 ));
-        potionsList.add(new Potion("50 life points", 50, 50));
+        boolean isAlive = true;
+        weaponsList.add(knife);
+        knife.setEquipped(true);
+        weaponsList.add(bow);
+        armorList.add(shield);
+        shield.setEquipped(true);
+        armorList.add(helmet);
+        potionsList.add(potion50);
+        potionsList.add(potion100);
+        gold = 100; // pagal lygi padaryti skirtinga gold kieki
     }
 
     public Player(String name) {
@@ -30,12 +38,17 @@ public class Player extends BaseCharacter {
         type = "Player";
         lifePoints = 100;
         armorPoints = 0;
-        damagePoints = 20;
-        boolean isAlive;
-    }
-
-    public String getName() {
-        return name;
+        damagePoints = 0;
+        boolean isAlive = true;
+        weaponsList.add(knife);
+        knife.setEquipped(true);
+        weaponsList.add(bow);
+        armorList.add(shield);
+        shield.setEquipped(true);
+        armorList.add(helmet);
+        potionsList.add(potion50);
+        potionsList.add(potion100);
+        gold = 100; // pagal lygi padaryti skirtinga gold kieki
     }
 
     public Map getMap() {
@@ -46,7 +59,5 @@ public class Player extends BaseCharacter {
         this.map = map;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+
 }
