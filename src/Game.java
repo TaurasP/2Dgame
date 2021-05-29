@@ -19,8 +19,8 @@ public class Game {
 
     //public static List<Achievement> achievements = new ArrayList<>();
 
-    public static Achievement achievement1 = new Achievement("New player.");
-    public static Achievement achievement2 = new Achievement("5 enemies killed.");
+    public static Achievement achievement1KilledEnemy = new Achievement("Your 1st killed enemy.");
+    public static Achievement achievement5KilledEnemies = new Achievement("5 enemies killed.");
 
     public static List<Map> maps = new ArrayList<>();
 
@@ -68,8 +68,8 @@ public class Game {
     }
 
     public static void start(Player player) {
-        player.achievementsList.add(achievement1);
-        player.achievementsList.add(achievement2);
+        player.achievementsList.add(achievement1KilledEnemy);
+        player.achievementsList.add(achievement5KilledEnemies);
 
         boolean exit = false;
 
@@ -223,7 +223,7 @@ public class Game {
     }
 
     private static void selectInventory(Player player) {
-        showInventoryOptions();
+        showInventoryOptions(player);
 
         switch (readUserInputChar()) {
             case '1':
@@ -366,31 +366,6 @@ public class Game {
         }
     }
 
-    /*public static void selectShopItemAction(Player player, String itemType, Item selectedItem) {
-        showShopItemAction(item);
-
-        switch (readUserInputChar()) {
-            case '1':
-                // EQUIP
-                equipItem(player, item);
-                selectInventoryItem(player, itemType);
-                break;
-            case '2':
-                // SELL
-                sellItem(player, item);
-                selectInventoryItem(player, itemType);
-                break;
-            case 'B':
-                // BACK
-                selectInventoryItem(player, itemType);
-                break;
-            default:
-                System.out.println("\nSelected number/letter does not exist.");
-                selectInventoryItemAction(player, itemType, item);
-                break;
-        }
-    }*/
-
     public static void equipItem(Player player, Item item) {
         if (!item.isEquipped) {
             if (isOtherItemEquipped(player, item)) {
@@ -401,7 +376,7 @@ public class Game {
                 } else if (item.type == ARMOR) {
                     unequipEquippedItem(player, item);
                     item.isEquipped = true;
-                    player.armorPoints += item.armor;
+                    player.armorPoints = item.armor;
                 }
             } else {
                 if (item.type == WEAPON) {
@@ -409,7 +384,7 @@ public class Game {
                     player.damagePoints += item.damage;
                 } else if (item.type == ARMOR) {
                     item.isEquipped = true;
-                    player.armorPoints += item.armor;
+                    player.armorPoints = item.armor;
                 }
             }
         } else {
@@ -446,12 +421,14 @@ public class Game {
             for (int i = 0; i < player.weaponsList.size(); i++) {
                 if(player.weaponsList.get(i).isEquipped) {
                     player.weaponsList.get(i).isEquipped = false;
+                    player.damagePoints -= player.weaponsList.get(i).damage;
                 }
             }
         } else if(item.type == ARMOR) {
             for (int i = 0; i < player.armorList.size(); i++) {
                 if(player.armorList.get(i).isEquipped) {
                     player.armorList.get(i).isEquipped = false;
+                    player.armorPoints -= player.armorList.get(i).armor;
                 }
             }
         }
@@ -463,8 +440,10 @@ public class Game {
                 if(player.weaponsList.get(i).getName() == item.name) {
                     item.isEquipped = false;
                     player.weaponsList.remove(i);
-                    player.damagePoints -= item.damage;
                     player.gold += item.price;
+                    if(item.isEquipped) {
+                        player.damagePoints -= item.damage;
+                    }
                 }
             }
         } else if(item.type == ARMOR) {
@@ -474,6 +453,9 @@ public class Game {
                     player.armorList.remove(i);
                     player.armorPoints -= item.armor;
                     player.gold += item.price;
+                    if(item.isEquipped) {
+                        player.armorPoints -= item.armor;
+                    }
                 }
             }
         } else if(item.type == POTION) {
@@ -495,19 +477,24 @@ public class Game {
         }
     }
 
-    public static void buyItem (Player player, Item item){
+    public static void buyItem(Player player, Item item){
         if (player.gold >= item.price) {
             if (item.type == WEAPON) {
                 player.weaponsList.add(item);
-                item.isEquipped = false;
+                //item.isEquipped = false;
+                equipItem(player, item);
                 player.gold -= item.price;
+                System.out.println("You bought " + item.name + ". It is equipped.");
             } else if (item.type == ARMOR) {
-                player.weaponsList.add(item);
-                item.isEquipped = false;
+                player.armorList.add(item);
+                //item.isEquipped = false;
+                equipItem(player, item);
                 player.gold -= item.price;
+                System.out.println("You bought " + item.name + ". It is equipped.");
             } else if (item.type == POTION) {
                 player.gold -= item.price;
                 player.lifePoints += item.lifePoints;
+                System.out.println("You bought " + item.name + ". It is equipped.");
             }
         } else {
             System.out.println("You don't have enough gold.");
@@ -517,7 +504,7 @@ public class Game {
 
     public static void equipStartingItems(Player player) {
         Weapon dagger = new Weapon("Dagger", 100, 20);
-        Armor woodenShield = new Armor("Shield", 50, 5);
+        Armor woodenShield = new Armor("Wooden Shield", 50, 5);
 
         player.weaponsList.add(dagger);
         dagger.setEquipped(true);
@@ -527,7 +514,8 @@ public class Game {
         for (int i = 0; i < player.weaponsList.size(); i++) {
             if(player.weaponsList.get(i).isEquipped) {
                 player.damagePoints += player.weaponsList.get(i).damage;
-            } else if(player.armorList.get(i).isEquipped) {
+            }
+            if(player.armorList.get(i).isEquipped) {
                 player.armorPoints += player.armorList.get(i).armor;
             }
         }
@@ -589,23 +577,26 @@ public class Game {
         Enemy enemy = player.getMap().getLastLocation().enemies.get(selectedEnemyIndex);
 
         if(enemy.isAlive) {
-            System.out.println("You have " + player.gold + " gold | " + player.lifePoints + " life points");
-            System.out.println("-----------------------------------------------------------");
+            //showPlayerLPAndGold(player);
 
             if (player.lifePoints > enemy.damagePoints) {
                 enemy.lifePoints = enemy.lifePoints - player.damagePoints;
-                player.lifePoints = player.lifePoints - enemy.damagePoints;
+                player.lifePoints = player.lifePoints + player.armorPoints - enemy.damagePoints;
 
-                if (enemy.lifePoints > 0) {
+                /*if (enemy.lifePoints > 0) {
                     System.out.println(enemy.type + " has " + enemy.lifePoints + " life points left.");
                     System.out.println("You have " + player.lifePoints + " life points left.");
-                }
+                }*/
 
                 if (enemy.lifePoints <= 0) {
                     System.out.println(enemy.type + " has 0 life points left. He is dead.");
                     enemy.isAlive = false;
+                    player.enemiesKilledCounter++;
+                    player.gold += 10;
+
                     player.getMap().getLastLocation().enemies.remove(selectedEnemyIndex);
                     System.out.println("You have " + player.lifePoints + " life points left.");
+                    checkAchievements(player);
 
                     if (player.getMap().getLastLocation().enemies.isEmpty()) {
                         for (int i = 0; i < player.getMap().locations.size(); i++) {
@@ -636,9 +627,10 @@ public class Game {
             System.out.println("-------------------------------------------------------------");
         } else {
             System.out.println("All locations are clear. No more enemies left.");
-            System.out.println("Victory! You won the game!");
+            System.out.println("Congratulations! You won the game!");
             // Give achievement or increment some flag to earn achievement later
             // Save data, think of scoring system, put player to high score leaderboard, reset his life points, gold, weapons, armor, potions. Anything else?
+            // Create picture from symbols or animation from symbols
 
             // need to edit main while engine, export startmenu to separate method
             showStartMenu();
@@ -667,7 +659,7 @@ public class Game {
 
     public static void showEnemies(Player player) {
         System.out.println("\n--------------------------ENEMIES--------------------------");
-        showPlayerLPAndGold(player);
+        showPlayerLPGoldDamageAndArmorPoints(player);
 
         if (player.getMap().getLastLocation().enemies.size() > 0) {
             for (int i = 0; i < player.getMap().getLastLocation().enemies.size(); i++) {
@@ -690,9 +682,9 @@ public class Game {
         }
     }
 
-    public static void showInventoryOptions() {
+    public static void showInventoryOptions(Player player) {
         System.out.println("\n---------------------------INVENTORY---------------------------");
-        showPlayerLPAndGold(player);
+        showPlayerLPGoldDamageAndArmorPoints(player);
         System.out.println("1. WEAPONS");
         System.out.println("2. ARMOR");
         System.out.println("3. POTIONS");
@@ -706,17 +698,17 @@ public class Game {
     public static void showInventoryItems(Player player, String itemType) {
         if(itemType.equalsIgnoreCase(WEAPON) && !player.weaponsList.isEmpty()) {
             System.out.println("\n---------------------------WEAPONS---------------------------");
-            showPlayerLPAndGold(player);
+            showPlayerLPGoldDamageAndArmorPoints(player);
             for (int i = 0; i < player.weaponsList.size(); i++) {
                 if(player.weaponsList.get(i).isEquipped) {
-                    System.out.println(i + ". " + player.weaponsList.get(i).getName().toUpperCase() + " | price: " + player.weaponsList.get(i).getPrice() + " | damage points: " + player.weaponsList.get(i).damage + " | (EQUIPPED)");
+                    System.out.println(i + ". " + player.weaponsList.get(i).getName().toUpperCase() + " | price: " + player.weaponsList.get(i).getPrice() + " | damage points: " + (player.baseDamagePoints + player.weaponsList.get(i).damage) + " | (EQUIPPED)");
                 } else{
-                    System.out.println(i + ". " + player.weaponsList.get(i).getName().toUpperCase() + " | price: " + player.weaponsList.get(i).getPrice() + " | damage points: " + player.weaponsList.get(i).damage);
+                    System.out.println(i + ". " + player.weaponsList.get(i).getName().toUpperCase() + " | price: " + player.weaponsList.get(i).getPrice() + " | damage points: " + (player.baseDamagePoints + player.weaponsList.get(i).damage));
                 }
             }
         } else if(itemType.equalsIgnoreCase(ARMOR) && !player.armorList.isEmpty()) {
             System.out.println("\n---------------------------ARMOR---------------------------");
-            showPlayerLPAndGold(player);
+            showPlayerLPGoldDamageAndArmorPoints(player);
             for (int i = 0; i < player.armorList.size(); i++) {
                 if(player.armorList.get(i).isEquipped) {
                     System.out.println(i + ". " + player.armorList.get(i).getName().toUpperCase() + " | price: " + player.armorList.get(i).getPrice() + " | armor points: " + player.armorList.get(i).armor + " | (EQUIPPED)");
@@ -726,7 +718,7 @@ public class Game {
             }
         } else if(itemType.equalsIgnoreCase(POTION) && !player.potionsList.isEmpty()) {
             System.out.println("\n---------------------------POTIONS---------------------------");
-            showPlayerLPAndGold(player);
+            showPlayerLPGoldDamageAndArmorPoints(player);
             for (int i = 0; i < player.potionsList.size(); i++) {
                 System.out.println(i + ". " + player.potionsList.get(i).getName().toUpperCase() + " | price: " + player.potionsList.get(i).getPrice() + ").");
             }
@@ -754,7 +746,7 @@ public class Game {
 
     public static void showShopOptions(Player player) {
         System.out.println("\n---------------------------SHOP---------------------------");
-        showPlayerLPAndGold(player);
+        showPlayerLPGoldDamageAndArmorPoints(player);
         System.out.println("1. WEAPONS");
         System.out.println("2. ARMOR");
         System.out.println("3. POTIONS");
@@ -768,13 +760,13 @@ public class Game {
     public static void showShopItems(Player player, String itemType) {
         if(itemType.equalsIgnoreCase(WEAPON) && !shop.weaponsListInShop.isEmpty()) {
             System.out.println("\n---------------------------WEAPONS---------------------------");
-            showPlayerLPAndGold(player);
+            showPlayerLPGoldDamageAndArmorPoints(player);
             for (int i = 0; i < shop.weaponsListInShop.size(); i++) {
-                System.out.println(i + ". " + shop.weaponsListInShop.get(i).getName().toUpperCase() + " | price: " + shop.weaponsListInShop.get(i).getPrice() + " | damage points: " + shop.weaponsListInShop.get(i).damage);
+                System.out.println(i + ". " + shop.weaponsListInShop.get(i).getName().toUpperCase() + " | price: " + shop.weaponsListInShop.get(i).getPrice() + " | damage points: " + (player.baseDamagePoints + shop.weaponsListInShop.get(i).damage));
             }
         } else if(itemType.equalsIgnoreCase(ARMOR) && !shop.armorListInShop.isEmpty()) {
             System.out.println("\n---------------------------ARMOR---------------------------");
-            showPlayerLPAndGold(player);
+            showPlayerLPGoldDamageAndArmorPoints(player);
             for (int i = 0; i < shop.armorListInShop.size(); i++) {
                 System.out.println(i + ". " + shop.armorListInShop.get(i).getName().toUpperCase() + " | price: " + shop.armorListInShop.get(i).getPrice() + " | armor points: " + shop.armorListInShop.get(i).armor);
             }
@@ -784,7 +776,7 @@ public class Game {
             int potion75Counter = 0;
 
             System.out.println("\n---------------------------POTIONS---------------------------");
-            showPlayerLPAndGold(player);
+            showPlayerLPGoldDamageAndArmorPoints(player);
             for (int i = 0; i < shop.potionsListInShop.size(); i++) {
                 if(shop.potionsListInShop.get(i).name.equals(Shop.POTION_25_LP)) {
                     potion25Counter += 1;
@@ -825,18 +817,13 @@ public class Game {
         System.out.print("Choose a number to buy an item:");
     }
 
-    /*public static void showShopItemAction(Item item) {
-        System.out.println("\n---------------------------" + item.getName().toUpperCase() + "---------------------------");
-        System.out.println("1. BUY");
-        System.out.println("------------------------------------------------------------");
-        System.out.println("B. BACK");
-        System.out.println("------------------------------------------------------------");
-
-        System.out.print("Choose a number to make an action with an item:");
-    }*/
-
     public static void showPlayerLPAndGold(Player player) {
         System.out.println("You have: " + player.gold + " gold | " + player.lifePoints + " life points");
+        System.out.println("-----------------------------------------------------------");
+    }
+
+    public static void showPlayerLPGoldDamageAndArmorPoints(Player player) {
+        System.out.println("You have: " + player.gold + " gold | " + player.lifePoints + " life points | " + player.damagePoints + " damage points | " + player.armorPoints + " armor points");
         System.out.println("-----------------------------------------------------------");
     }
 
@@ -917,5 +904,18 @@ public class Game {
         String userInput = SCANNER.nextLine().toUpperCase();
 
         return userInput;
+    }
+
+    public static void checkAchievements(Player player) {
+        if(player.enemiesKilledCounter == 1) {
+            System.out.println("\n---------------------------NEW ACHIEVEMENT---------------------------");
+            System.out.println(achievement1KilledEnemy.getName().toUpperCase());
+            System.out.println("---------------------------------------------------------------------");
+        }
+        if(player.enemiesKilledCounter == 5) {
+            System.out.println("\n---------------------------NEW ACHIEVEMENT---------------------------");
+            System.out.println(achievement5KilledEnemies.getName().toUpperCase());
+            System.out.println("---------------------------------------------------------------------");
+        }
     }
 }

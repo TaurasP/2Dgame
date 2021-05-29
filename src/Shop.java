@@ -11,15 +11,15 @@ public class Shop {
     public static final String POTION_75_LP = "75 life points";
 
     public static Weapon dagger = new Weapon("Dagger", 50, 20);
-    public static Weapon knife = new Weapon("Knife", 100, 20);
-    public static Weapon axe = new Weapon("Axe", 200, 20);
-    public static Weapon hammer = new Weapon("Hammer", 300, 20);
-    public static Weapon bow = new Weapon("Bow", 50, 20);
-    public static Weapon longBow = new Weapon("Long Bow", 150, 20);
+    public static Weapon knife = new Weapon("Knife", 100, 25);
+    public static Weapon axe = new Weapon("Axe", 200, 45);
+    public static Weapon hammer = new Weapon("Hammer", 300, 95);
+    public static Weapon bow = new Weapon("Bow", 100, 25);
+    public static Weapon longBow = new Weapon("Long Bow", 150, 30);
 
-    public static Armor woodenShield = new Armor("Shield", 50, 5);
-    public static Armor ironShield = new Armor("Shield", 100, 10);
-    public static Armor bigShield = new Armor("Shield", 200, 20);
+    public static Armor woodenShield = new Armor("Wooden Shield", 50, 5);
+    public static Armor ironShield = new Armor("Iron Shield", 100, 10);
+    public static Armor bigShield = new Armor("Big Shield", 200, 20);
 
     public static Potion potion25 = new Potion(POTION_25_LP, 25, 25);
     public static Potion potion50 = new Potion(POTION_50_LP, 50, 50);
