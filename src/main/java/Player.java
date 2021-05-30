@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Player extends BaseCharacter {
 
-    public Map map;
+    public GameMap gameMap;
     public static List<Achievement> achievementsList = new ArrayList<>();
     public static List<Item> weaponsList = new ArrayList<>();
     public static List<Item> armorList = new ArrayList<>();
@@ -34,11 +34,11 @@ public class Player extends BaseCharacter {
         enemiesKilledCounter = 0;
     }
 
-    public Map getMap() {
-        return map;
+    public GameMap getMap() {
+        return gameMap;
     }
 
-    public void setMap(Map map) {
-        this.map = map;
+    public void setMap(GameMap gameMap) {
+        this.gameMap = gameMap;
     }
 }

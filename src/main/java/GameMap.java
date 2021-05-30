@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Map {
+public class GameMap {
     private String name;
     private Location lastLocation;
     public List<Location> locations;
@@ -22,7 +22,7 @@ public class Map {
         this.lastLocation = lastLocation;
     }
 
-    public Map(String name) {
+    public GameMap(String name) {
         this.name = name;
         locations = new ArrayList<>();
         lastLocation = new Location("");

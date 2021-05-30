@@ -1,15 +1,11 @@
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Game {
 
@@ -32,10 +28,10 @@ public class Game {
     public static Achievement achievement1KilledEnemy = new Achievement("Your 1st killed enemy.");
     public static Achievement achievement5KilledEnemies = new Achievement("5 enemies killed.");
 
-    public static List<Map> maps = new ArrayList<>();
+    public static List<GameMap> maps = new ArrayList<>();
 
-    public static Map map1 = new Map("Lietuva");
-    public static Map map2 = new Map("Latvija");
+    public static GameMap map1 = new GameMap("Lietuva");
+    public static GameMap map2 = new GameMap("Latvija");
 
     public static Location location1 = new Location("Vilnius");
     public static Location location2 = new Location("Klaipeda");
@@ -95,7 +91,7 @@ public class Game {
                     break;
                 case '2':
                     // CREATE / IMPORT MAP
-                    importMapsFromExcel();
+                    importMapFromExcel();
                     showStartMenu();
                     //exportMapsToExcel();
                     //showStartMenu();
@@ -931,55 +927,59 @@ public class Game {
         }
     }
 
-    public static void importMapsFromExcel(){
+    public static void importMapFromExcel() {
         try {
             FileInputStream file = new FileInputStream(new File(FILE_NAME));
-
             XSSFWorkbook workbook = new XSSFWorkbook(file);
-
             XSSFSheet sheet = workbook.getSheetAt(0);
 
-            for (int i = 1; i < sheet.getLastRowNum() + 1; i++) {
+            Row secondRow = sheet.getRow(1);
+            Cell cellMapName = secondRow.getCell(0);
+            String mapName = cellMapName.getStringCellValue();
+
+            int lastRowNumber = sheet.getLastRowNum() + 1;
+            boolean mapExists, locationExists;
+
+            // read MAP and LOCATIONS from excel
+            for (int i = 1; i < lastRowNumber; i++) {
+                mapExists = false;
                 Row row = sheet.getRow(i);
+                Cell cellLocationName = row.getCell(1);
 
-                Cell cellMap = row.getCell(0);
-                Cell cellLocation = row.getCell(1);
-
-                // ITERATE MAPS
-                if (!maps.isEmpty() && cellMap != null && cellLocation != null) {
-
-                    // sutvarkyti cikla, nes iki Latvijos neateina, neranda
+                if (cellLocationName != null) {
+                    Location newLocation;
+                    // ITERATE MAPS
                     for (int j = 0; j < maps.size(); j++) {
 
-                        // IF MAP ALREADY EXISTS
-                        if (cellMap.getStringCellValue().equalsIgnoreCase(maps.get(j).getName())) {
-                            System.out.println(cellMap.getStringCellValue() + " exists");
+                        // IF MAP EXISTS
+                        if (maps.get(j).getName().equalsIgnoreCase(mapName)) {
+                            mapExists = true;
+                            locationExists = false;
 
                             // ITERATE LOCATIONS
                             for (int k = 0; k < maps.get(j).locations.size(); k++) {
 
                                 // IF LOCATION EXISTS
-                                if (cellLocation.getStringCellValue().equalsIgnoreCase(maps.get(j).locations.get(k).getName())) {
-                                    System.out.println(cellLocation.getStringCellValue() + " exists");
-
-                                } else {
-                                    // IF LOCATION DOESN'T EXIST
-                                    System.out.println(cellLocation.getStringCellValue() + " doesn't exist");
-                                    maps.get(j).locations.add(new Location(cellLocation.getStringCellValue()));
+                                if (maps.get(j).locations.get(k).getName().equalsIgnoreCase(cellLocationName.getStringCellValue())) {
+                                    locationExists = true;
                                 }
-                                break;
                             }
 
-                            // IF MAP DOESN'T EXIST
-                        } else if (!cellMap.getStringCellValue().equalsIgnoreCase(maps.get(j).getName())) {
-                            System.out.println(cellMap.getStringCellValue() + " doesn't exist");
-                            System.out.println(cellLocation.getStringCellValue() + " doesn't exist");
-                            Map newMap = new Map(cellMap.getStringCellValue());
-                            maps.add(newMap);
-                            newMap.locations.add(new Location(cellLocation.getStringCellValue()));
-                            //break;
+                            // IF LOCATION DOESN'T EXIST
+                            if (!locationExists) {
+                                newLocation = new Location(cellLocationName.getStringCellValue());
+                                maps.get(j).locations.add(newLocation);
+                            }
+                            //break; // ar reikia?
                         }
-                        break;
+                    }
+
+                    // IF MAP DOESN'T EXIST
+                    if (!mapExists) {
+                        GameMap newMap = new GameMap(mapName);
+                        newLocation = new Location(cellLocationName.getStringCellValue());
+                        maps.add(newMap);
+                        newMap.locations.add(newLocation);
                     }
                 }
             }
@@ -989,7 +989,105 @@ public class Game {
         }
     }
 
-    public static void exportMapsToExcel() {
+    /*public static void importMapsFromExcel(){
+        try {
+            List<String> tempMapsNamesListFromExcel = new ArrayList<>();
+            List<String> tempLocationsNamesListFromExcel = new ArrayList<>();
+
+            List<String> tempMapsNamesListFromGame = new ArrayList<>();
+            List<String> tempLocationsNamesListFromGame = new ArrayList<>();
+
+            //Map<String, String> tempMapsAndLocations = new HashMap<>();
+
+            FileInputStream file = new FileInputStream(new File(FILE_NAME));
+
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            int lastRowNumber = sheet.getLastRowNum() + 1;
+
+            for (int i = 0; i < maps.size(); i++) {
+                 tempMapsNamesListFromGame.add(maps.get(i).getName());
+            }
+
+            // read MAPS and LOCATIONS from excel
+            for (int i = 1; i < lastRowNumber; i++) {
+                Row row = sheet.getRow(i);
+                Cell cellMap = row.getCell(0);
+                Cell cellLocation = row.getCell(1);
+
+                if (cellMap != null && cellLocation != null) {
+                    tempMapsNamesListFromExcel.add(cellMap.getStringCellValue());
+                    tempLocationsNamesListFromExcel.add(cellLocation.getStringCellValue());
+                    //tempMapsAndLocations.put(cellMap.getStringCellValue(), cellLocation.getStringCellValue());
+                }
+            }
+
+            for(String s : tempMapsNamesListFromGame) {
+                System.out.println(s);
+            }
+
+            //tempMapsAndLocations.forEach((key, value) -> System.out.println(key + " " + value));
+
+
+            *//*for(String s : tempMapsList) {
+                System.out.println(s);
+            }
+
+            for(String s : tempLocationsList) {
+                System.out.println(s);
+            }*//*
+
+
+            //boolean isCreated = false;
+            // ITERATE MAPS FROM EXCEL
+            *//*for (int i = 0; i < tempMapsList.size(); i++) {
+
+                // ITERATE MAPS
+                for (int j = 0; j < maps.size(); j++) {
+
+                    // IF MAP ALREADY EXISTS
+                    if (tempMapsList.contains(maps.get(j))) {
+                        System.out.println(tempMapsList.get(i) + " exists");
+
+                        // ITERATE LOCATIONS FROM EXCEL
+                        for (int k = 0; k < tempLocationsList.size(); k++) {
+
+                            // ITERATE LOCATIONS
+                            for (int l = 0; l < maps.get(j).locations.size(); l++) {
+                                // IF LOCATION EXISTS
+                                *//**//*if (tempLocationsList.get(l).equalsIgnoreCase(maps.get(j).locations.get(k).getName())) {
+                                    System.out.println(tempLocationsList.get(l) + " exists");
+                                }*//**//*
+                            }
+                        }
+                        //else {
+                        // IF LOCATION DOESN'T EXIST
+                        //System.out.println(tempLocationsList.get(j) + " doesn't exist");
+                        //maps.get(i).locations.add(new Location(tempLocationsList.get(j)));
+                        //}
+                        //break;
+                    // IF MAP DOESN'T EXIST
+                    } else {
+                        //System.out.println(tempMapsList.get(i) + " doesn't exist");
+                        //System.out.println(tempLocationsList.get(j) + " doesn't exist");
+
+                        //Map newMap = new Map(tempMapsList.get(i));
+                        //maps.add(newMap);
+
+                        //newMap.locations.add(new Location(cellLocation.getStringCellValue()));
+                    }
+                }
+                //break;
+            }*//*
+            file.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    /*public static void exportMapsAndLocationsToExcel() {
         XSSFWorkbook workbook = new XSSFWorkbook();
 
         XSSFSheet sheet = workbook.createSheet("Maps");
@@ -1019,5 +1117,5 @@ public class Game {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }
