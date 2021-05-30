@@ -23,6 +23,13 @@
             <version>5.0.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.webfirmframework/wffweb -->
+        <dependency>
+            <groupId>com.webfirmframework</groupId>
+            <artifactId>wffweb</artifactId>
+            <version>3.0.16</version>
+        </dependency>
+
 
     </dependencies>
 

@@ -10,7 +10,7 @@ public class Player extends BaseCharacter {
     public static List<Item> potionsList = new ArrayList<>();
 
     public static int enemiesKilledCounter;
-
+    public int highScore = 50;
     public static int baseDamagePoints = 5;
 
     public Player() {
@@ -38,7 +38,15 @@ public class Player extends BaseCharacter {
         return gameMap;
     }
 
+    public int getHighScore() {
+        return highScore;
+    }
+
     public void setMap(GameMap gameMap) {
         this.gameMap = gameMap;
+    }
+
+    public void setHighScore(int highScore) {
+        this.highScore = highScore;
     }
 }
