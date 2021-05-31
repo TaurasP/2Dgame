@@ -34,6 +34,7 @@ public class Game {
     public final int ENEMIES_HARD_LEVEL = 6;
 
     private String level;
+    public boolean isRestartRequired = false;
 
     public Achievement achievement1KilledEnemy = new Achievement("Your 1st killed enemy.");
     public Achievement achievement5KilledEnemies = new Achievement("5 enemies killed.");
@@ -85,10 +86,10 @@ public class Game {
         //map2.locations.add(location4);
     }
 
-    public void start(Player player) throws IOException {
-        boolean exit = false;
+    public boolean start(Player player) throws IOException {
+        //boolean exit = false;
 
-        while (!exit) {
+        //while (!exit) {
             showStartMenu();
             switch (readUserInputChar()) {
                 case '1':
@@ -105,13 +106,14 @@ public class Game {
                     openPlayersHighScoresHTML();
                     break;
                 case 'E':
-                    exit = true;
+                    //exit = true;
                     break;
                 default:
                     System.out.println("\nSelected number/letter does not exist.");
                     break;
             }
-        }
+        //}
+        return isRestartRequired;
     }
 
     // BUBBLE SORT ALGORITHM (DESCENDING)
@@ -397,7 +399,7 @@ public class Game {
                 selectFromGameMenu(player);
                 break;
             case 'R':
-                restartGame(player);
+                // new GAME and new PLAYER
                 break;
             case 'E':
                 System.exit(0);
@@ -407,20 +409,6 @@ public class Game {
                 selectFromGameMenu(player);
                 break;
         }
-    }
-
-    public void restartGame(Player player){
-        /*for (int i = 0; i < maps.size(); i++) {
-            if (maps.get(i).getName().equalsIgnoreCase(player.gameMap.getName())) {
-                for (int j = 0; j < player.gameMap.locations.size(); j++) {
-                    player.gameMap.locations.get(j).enemies = null;
-                }
-
-            }
-        }
-        player.gameMap.locations = null;
-        player.gameMap = null;*/
-        player = null;
     }
 
     private void selectLocation(Player player) throws IOException {
@@ -446,7 +434,6 @@ public class Game {
         if (!isSelected) {
             System.out.println("\nSelected number/letter does not exist.");
             selectLocation(player);
-
         }
     }
 
@@ -879,7 +866,7 @@ public class Game {
         } else {
             System.out.println("All locations are clear. No more enemies left.");
             congratulatePlayer(player);
-            System.exit(0);
+            //kaip iseiti is start metodo?
         }
     }
 
