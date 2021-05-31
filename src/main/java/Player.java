@@ -4,15 +4,15 @@ import java.util.List;
 public class Player extends BaseCharacter {
 
     public GameMap gameMap;
-    public static List<Achievement> achievementsList = new ArrayList<>();
-    public static List<Item> weaponsList = new ArrayList<>();
-    public static List<Item> armorList = new ArrayList<>();
-    public static List<Item> potionsList = new ArrayList<>();
+    public List<Achievement> achievementsList = new ArrayList<>();
+    public List<Item> weaponsList = new ArrayList<>();
+    public List<Item> armorList = new ArrayList<>();
+    public List<Item> potionsList = new ArrayList<>();
 
-    public static int enemiesKilledCounter;
-    public static int locationsClearedCounter;
+    public int enemiesKilledCounter;
+    public int locationsClearedCounter;
     public int highScore = 0;
-    public static int baseDamagePoints = 5;
+    public int baseDamagePoints = 5;
 
     public Player() {
         type = "Player";

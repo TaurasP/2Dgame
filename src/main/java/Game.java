@@ -1,7 +1,6 @@
 import com.webfirmframework.wffweb.tag.html.Body;
 import com.webfirmframework.wffweb.tag.html.H1;
 import com.webfirmframework.wffweb.tag.html.Html;
-import com.webfirmframework.wffweb.tag.html.P;
 import com.webfirmframework.wffweb.tag.html.attribute.global.Style;
 import com.webfirmframework.wffweb.tag.html.metainfo.Head;
 import com.webfirmframework.wffweb.tag.html.stylesandsemantics.Div;
@@ -20,40 +19,40 @@ import java.util.List;
 
 public class Game {
 
-    static final String FILE_NAME_MAP = "Map.xlsx";
-    static final String FILE_NAME_PLAYERS_SCORES = "Scores.xlsx";
-    static final String FILE_NAME_PLAYERS_HIGH_SCORES = "top100.html";
-    private static final Scanner SCANNER = new Scanner(System.in);
-    public static final String WEAPON = "Weapon";
-    public static final String ARMOR = "Armor";
-    public static final String POTION = "Potion";
-    private static final String EASY_LEVEL = "EASY";
-    private static final String MEDIUM_LEVEL = "MEDIUM";
-    private static final String HARD_LEVEL = "HARD";
-    private static final int ENEMIES_EASY_LEVEL = 2;
-    private static final int ENEMIES_MEDIUM_LEVEL = 4;
-    private static final int ENEMIES_HARD_LEVEL = 6;
+    public final String FILE_NAME_MAP = "Map.xlsx";
+    public final String FILE_NAME_PLAYERS_SCORES = "Scores.xlsx";
+    public final String FILE_NAME_PLAYERS_HIGH_SCORES = "top100.html";
+    public final Scanner SCANNER = new Scanner(System.in);
+    public final String WEAPON = "Weapon";
+    public final String ARMOR = "Armor";
+    public final String POTION = "Potion";
+    private final String EASY_LEVEL = "EASY";
+    private final String MEDIUM_LEVEL = "MEDIUM";
+    private final String HARD_LEVEL = "HARD";
+    public final int ENEMIES_EASY_LEVEL = 2;
+    public final int ENEMIES_MEDIUM_LEVEL = 4;
+    public final int ENEMIES_HARD_LEVEL = 6;
 
-    private static String level;
+    private String level;
 
-    public static Achievement achievement1KilledEnemy = new Achievement("Your 1st killed enemy.");
-    public static Achievement achievement5KilledEnemies = new Achievement("5 enemies killed.");
-    public static Achievement achievement10KilledEnemies = new Achievement("10 enemies killed.");
-    public static Achievement achievement1LocationCleared = new Achievement("Your 1st cleared location.");
+    public Achievement achievement1KilledEnemy = new Achievement("Your 1st killed enemy.");
+    public Achievement achievement5KilledEnemies = new Achievement("5 enemies killed.");
+    public Achievement achievement10KilledEnemies = new Achievement("10 enemies killed.");
+    public Achievement achievement1LocationCleared = new Achievement("Your 1st cleared location.");
 
-    public static List<GameMap> maps = new ArrayList<>();
+    public List<GameMap> maps = new ArrayList<>();
 
-    public static GameMap map1 = new GameMap("Lietuva");
-    public static GameMap map2 = new GameMap("Latvija");
+    public GameMap map1 = new GameMap("Lietuva");
+    public GameMap map2 = new GameMap("Latvija");
 
-    public static Location location1 = new Location("Vilnius");
-    public static Location location2 = new Location("Klaipeda");
-    public static Location location3 = new Location("Ryga");
-    //public static Location location4 = new Location("Ventspils");
+    public Location location1 = new Location("Vilnius");
+    public Location location2 = new Location("Klaipeda");
+    public Location location3 = new Location("Ryga");
+    //public Location location4 = new Location("Ventspils");
 
-    public static Shop shop = new Shop();
+    public Shop shop = new Shop();
 
-    public static int getEnemiesNumberFromLevel() {
+    public int getEnemiesNumberFromLevel() {
         int enemiesNumber = 0;
 
         if (level == EASY_LEVEL) {
@@ -66,7 +65,7 @@ public class Game {
         return enemiesNumber;
     }
 
-    public static void generateEnemies() {
+    public void generateEnemies() {
         for (int i = 0; i < maps.size(); i++) {
             for (int j = 0; j < maps.get(i).locations.size(); j++) {
                 for (int k = 0; k < getEnemiesNumberFromLevel(); k++) {
@@ -86,7 +85,7 @@ public class Game {
         //map2.locations.add(location4);
     }
 
-    public static void start(Player player, Game game) throws IOException {
+    public void start(Player player) throws IOException {
         boolean exit = false;
 
         while (!exit) {
@@ -111,13 +110,12 @@ public class Game {
                 default:
                     System.out.println("\nSelected number/letter does not exist.");
                     break;
-
             }
         }
     }
 
     // BUBBLE SORT ALGORITHM (DESCENDING)
-    public static List<Player> sortHighScoreList(List<Player> highScoreList) {
+    public List<Player> sortHighScoreList(List<Player> highScoreList) {
         String tempName;
         int num, i, j, tempHighScore;
         num = highScoreList.size();
@@ -149,7 +147,7 @@ public class Game {
         return highScoreList;
     }
 
-    public static void checkIfPlayerEarnedAchievement(Player player) {
+    public void checkIfPlayerEarnedAchievement(Player player) {
         if (player.enemiesKilledCounter == 1) {
             player.achievementsList.add(achievement1KilledEnemy);
             showAchievement(achievement1KilledEnemy);
@@ -168,13 +166,13 @@ public class Game {
         }
     }
 
-    public static void showAchievement(Achievement achievement) {
+    public void showAchievement(Achievement achievement) {
         System.out.println("\n----------------------NEW ACHIEVEMENT----------------------");
         System.out.println(achievement.getName().toUpperCase());
         System.out.println("-----------------------------------------------------------");
     }
 
-    public static void exportPlayersHighScoresToHTML(List<Player> playersHighScoreList) throws IOException {
+    public void exportPlayersHighScoresToHTML(List<Player> playersHighScoreList) throws IOException {
 
         final Style style3 = new Style("border: 1px solid black;");
 
@@ -260,7 +258,7 @@ public class Game {
         FileUtils.writeStringToFile(newHtmlFile, rootTag.toHtmlString());
     }
 
-    private static void selectMap(Player player) throws IOException {
+    private void selectMap(Player player) throws IOException {
         String userInput;
         boolean isFound = false;
 
@@ -287,7 +285,7 @@ public class Game {
         }
     }
 
-    public static void selectToCreateOrImportMap() {
+    public void selectToCreateOrImportMap() {
         showCreateAndImportMapOptions();
 
         switch (readUserInputChar()) {
@@ -311,7 +309,7 @@ public class Game {
         }
     }
 
-    public static void createMap() {
+    public void createMap() {
         System.out.print("Enter map's name: ");
         String mapName = readUserInputString();
         GameMap newMap = new GameMap(mapName);
@@ -333,7 +331,7 @@ public class Game {
         }
     }
 
-    public static void selectLevel(Player player) throws IOException {
+    public void selectLevel(Player player) throws IOException {
         showLevelsOptions();
 
         switch (readUserInputChar()) {
@@ -367,7 +365,7 @@ public class Game {
         }
     }
 
-    private static void enterPlayerName(Player player) throws IOException {
+    private void enterPlayerName(Player player) throws IOException {
         System.out.print("Enter player's name: ");
         player.setName(readUserInputString());
 
@@ -376,7 +374,7 @@ public class Game {
         selectFromGameMenu(player);
     }
 
-    private static void selectFromGameMenu(Player player) throws IOException {
+    private void selectFromGameMenu(Player player) throws IOException {
         showGameMenu();
 
         switch (readUserInputChar()) {
@@ -399,7 +397,7 @@ public class Game {
                 selectFromGameMenu(player);
                 break;
             case 'R':
-                //restartGame(player);
+                restartGame(player);
                 break;
             case 'E':
                 System.exit(0);
@@ -411,7 +409,7 @@ public class Game {
         }
     }
 
-    public static void restartGame(Player player){
+    public void restartGame(Player player){
         /*for (int i = 0; i < maps.size(); i++) {
             if (maps.get(i).getName().equalsIgnoreCase(player.gameMap.getName())) {
                 for (int j = 0; j < player.gameMap.locations.size(); j++) {
@@ -420,12 +418,12 @@ public class Game {
 
             }
         }
-        player.gameMap.locations = null;*/
-        player.gameMap = new GameMap("");
+        player.gameMap.locations = null;
+        player.gameMap = null;*/
         player = null;
     }
 
-    private static void selectLocation(Player player) throws IOException {
+    private void selectLocation(Player player) throws IOException {
         String userInput;
         boolean isSelected = false;
 
@@ -452,7 +450,7 @@ public class Game {
         }
     }
 
-    private static void selectInventory(Player player) throws IOException {
+    private void selectInventory(Player player) throws IOException {
         showInventoryOptions(player);
 
         switch (readUserInputChar()) {
@@ -475,7 +473,7 @@ public class Game {
         }
     }
 
-    public static void selectInventoryItem(Player player, String itemType) throws IOException {
+    public void selectInventoryItem(Player player, String itemType) throws IOException {
         String userInput;
         boolean isSelected = false;
         Item selectedItem;
@@ -504,7 +502,7 @@ public class Game {
         }
     }
 
-    public static void selectInventoryItemAction(Player player, String itemType, Item item) throws IOException {
+    public void selectInventoryItemAction(Player player, String itemType, Item item) throws IOException {
         showInventoryItemAction(item);
 
         switch (readUserInputChar()) {
@@ -529,7 +527,7 @@ public class Game {
         }
     }
 
-    private static void selectShop(Player player) throws IOException {
+    private void selectShop(Player player) throws IOException {
         showShopOptions(player);
 
         switch (readUserInputChar()) {
@@ -552,7 +550,7 @@ public class Game {
         }
     }
 
-    public static void selectShopItem(Player player, String itemType) throws IOException {
+    public void selectShopItem(Player player, String itemType) throws IOException {
         String userInput;
         boolean isSelected = false;
         Item selectedItem;
@@ -596,7 +594,7 @@ public class Game {
         }
     }
 
-    public static void equipItem(Player player, Item item) {
+    public void equipItem(Player player, Item item) {
         if (!item.isEquipped) {
             if (isOtherItemEquipped(player, item)) {
                 if (item.type == WEAPON) {
@@ -626,7 +624,7 @@ public class Game {
         }
     }
 
-    public static boolean isOtherItemEquipped(Player player, Item item) {
+    public boolean isOtherItemEquipped(Player player, Item item) {
         int counter = 0;
 
         if (item.type == WEAPON) {
@@ -646,7 +644,7 @@ public class Game {
         return counter == 1 ? true : false;
     }
 
-    public static void unequipEquippedItem(Player player, Item item) {
+    public void unequipEquippedItem(Player player, Item item) {
         if (item.type == WEAPON) {
             for (int i = 0; i < player.weaponsList.size(); i++) {
                 if (player.weaponsList.get(i).isEquipped) {
@@ -664,7 +662,7 @@ public class Game {
         }
     }
 
-    public static void sellItem(Player player, Item item) {
+    public void sellItem(Player player, Item item) {
         if (item.type == WEAPON) {
             for (int i = 0; i < player.weaponsList.size(); i++) {
                 if (player.weaponsList.get(i).getName() == item.name) {
@@ -698,7 +696,7 @@ public class Game {
         }
     }
 
-    public static void usePotion(Player player, Item item) {
+    public void usePotion(Player player, Item item) {
         for (int i = 0; i < player.potionsList.size(); i++) {
             if (player.potionsList.get(i).name == item.name) {
                 player.lifePoints += item.lifePoints;
@@ -707,7 +705,7 @@ public class Game {
         }
     }
 
-    public static void buyItem(Player player, Item item) throws IOException {
+    public void buyItem(Player player, Item item) throws IOException {
         if (player.gold >= item.price) {
             if (item.type == WEAPON) {
                 player.weaponsList.add(item);
@@ -732,7 +730,7 @@ public class Game {
         selectShopItem(player, item.type);
     }
 
-    public static void equipStartingItems(Player player) {
+    public void equipStartingItems(Player player) {
         Weapon dagger = new Weapon("Dagger", 100, 20);
         Armor woodenShield = new Armor("Wooden Shield", 50, 5);
 
@@ -751,7 +749,7 @@ public class Game {
         }
     }
 
-    public static List<Item> getSelectedPlayerItemList(Player player, String itemType) {
+    public List<Item> getSelectedPlayerItemList(Player player, String itemType) {
         List<Item> itemList = new ArrayList<>();
 
         if (itemType.equalsIgnoreCase(WEAPON)) {
@@ -764,7 +762,7 @@ public class Game {
         return itemList;
     }
 
-    public static List<Item> getSelectedShopItemList(Player player, String itemType) {
+    public List<Item> getSelectedShopItemList(Player player, String itemType) {
         List<Item> itemList = new ArrayList<>();
 
         if (itemType.equalsIgnoreCase(WEAPON)) {
@@ -777,7 +775,7 @@ public class Game {
         return itemList;
     }
 
-    private static void attackEnemy(Player player) throws IOException {
+    private void attackEnemy(Player player) throws IOException {
         String userInput;
         int selectedEnemyIndex;
         boolean isSelected = false;
@@ -803,7 +801,7 @@ public class Game {
         }
     }
 
-    public static void attack(Player player, int selectedEnemyIndex) {
+    public void attack(Player player, int selectedEnemyIndex) {
         int hits = 0;
         Enemy enemy = player.getMap().getLastLocation().enemies.get(selectedEnemyIndex);
 
@@ -844,7 +842,7 @@ public class Game {
         }
     }
 
-    public static void scorePlayer(Player player, int hits) {
+    public void scorePlayer(Player player, int hits) {
         if(hits == 1) {
             player.setHighScore(player.getHighScore() + 100);
         } else if(hits == 2) {
@@ -854,7 +852,7 @@ public class Game {
         }
     }
 
-    public static void showCreateAndImportMapOptions() {
+    public void showCreateAndImportMapOptions() {
         System.out.println("\n---------------------------CREATE / IMPORT MAP---------------------------");
         System.out.println(maps.size() + " maps in total.");
         System.out.println("-------------------------------------------------------------------------");
@@ -867,7 +865,7 @@ public class Game {
         System.out.print("Choose a number to select an item:");
     }
 
-    private static void showLocations(Player player) throws IOException {
+    private void showLocations(Player player) throws IOException {
         System.out.println("\n-------------------------LOCATIONS-------------------------");
         showPlayerLPAndGold(player);
         if (player.getMap().locations.size() > 0) {
@@ -885,7 +883,7 @@ public class Game {
         }
     }
 
-    public static void congratulatePlayer(Player player) throws IOException {
+    public void congratulatePlayer(Player player) throws IOException {
         System.out.println("\n--------------------------WINNER---------------------------");
 
         System.out.println("Congratulations! You have won the game!");
@@ -897,7 +895,7 @@ public class Game {
         openPlayersHighScoresHTML();
     }
 
-    public static void openPlayersHighScoresHTML() {
+    public void openPlayersHighScoresHTML() {
         try {
             File file = new File(FILE_NAME_PLAYERS_HIGH_SCORES);
             if(!Desktop.isDesktopSupported())
@@ -913,7 +911,7 @@ public class Game {
         }
     }
 
-    private static void showAchievements(Player player) throws IOException {
+    private void showAchievements(Player player) throws IOException {
         if (player.achievementsList.size() > 0) {
             System.out.println("\n--------------------------ACHIEVEMENTS--------------------------");
             for (int i = 0; i < player.achievementsList.size(); i++) {
@@ -937,7 +935,7 @@ public class Game {
         }
     }
 
-    public static void showEnemies(Player player) throws IOException {
+    public void showEnemies(Player player) throws IOException {
         System.out.println("\n--------------------------ENEMIES--------------------------");
         showPlayerLPGoldDamageAndArmorPoints(player);
 
@@ -962,7 +960,7 @@ public class Game {
         }
     }
 
-    public static void showInventoryOptions(Player player) {
+    public void showInventoryOptions(Player player) {
         System.out.println("\n---------------------------INVENTORY---------------------------");
         showPlayerLPGoldDamageAndArmorPoints(player);
         System.out.println("1. WEAPONS");
@@ -975,7 +973,7 @@ public class Game {
         System.out.print("Choose a number to select an item category:");
     }
 
-    public static void showInventoryItems(Player player, String itemType) throws IOException {
+    public void showInventoryItems(Player player, String itemType) throws IOException {
         if (itemType.equalsIgnoreCase(WEAPON) && !player.weaponsList.isEmpty()) {
             System.out.println("\n---------------------------WEAPONS---------------------------");
             showPlayerLPGoldDamageAndArmorPoints(player);
@@ -1024,7 +1022,7 @@ public class Game {
         }
     }
 
-    public static void showShopOptions(Player player) {
+    public void showShopOptions(Player player) {
         System.out.println("\n---------------------------SHOP---------------------------");
         showPlayerLPGoldDamageAndArmorPoints(player);
         System.out.println("1. WEAPONS");
@@ -1037,7 +1035,7 @@ public class Game {
         System.out.print("Choose a number to select an item category:");
     }
 
-    public static void showShopItems(Player player, String itemType) throws IOException {
+    public void showShopItems(Player player, String itemType) throws IOException {
         if (itemType.equalsIgnoreCase(WEAPON) && !shop.weaponsListInShop.isEmpty()) {
             System.out.println("\n---------------------------WEAPONS---------------------------");
             showPlayerLPGoldDamageAndArmorPoints(player);
@@ -1058,24 +1056,25 @@ public class Game {
             System.out.println("\n---------------------------POTIONS---------------------------");
             showPlayerLPGoldDamageAndArmorPoints(player);
             for (int i = 0; i < shop.potionsListInShop.size(); i++) {
-                if (shop.potionsListInShop.get(i).name.equals(Shop.POTION_25_LP)) {
+                Shop shop = new Shop();
+                if (shop.potionsListInShop.get(i).name.equals(shop.POTION_25_LP)) {
                     potion25Counter += 1;
                 }
-                if (shop.potionsListInShop.get(i).name.equals(Shop.POTION_50_LP)) {
+                if (shop.potionsListInShop.get(i).name.equals(shop.POTION_50_LP)) {
                     potion50Counter += 1;
                 }
-                if (shop.potionsListInShop.get(i).name.equals(Shop.POTION_75_LP)) {
+                if (shop.potionsListInShop.get(i).name.equals(shop.POTION_75_LP)) {
                     potion75Counter += 1;
                 }
             }
             if (potion25Counter >= 1) {
-                System.out.println("1. " + Shop.POTION_25_LP.toUpperCase() + " | price: " + Shop.potion25.getPrice() + " gold");
+                System.out.println("1. " + shop.POTION_25_LP.toUpperCase() + " | price: " + shop.potion25.getPrice() + " gold");
             }
             if (potion50Counter >= 1) {
-                System.out.println("2. " + Shop.POTION_50_LP.toUpperCase() + " | price: " + Shop.potion50.getPrice() + " gold");
+                System.out.println("2. " + shop.POTION_50_LP.toUpperCase() + " | price: " + shop.potion50.getPrice() + " gold");
             }
             if (potion75Counter >= 1) {
-                System.out.println("3. " + Shop.POTION_75_LP.toUpperCase() + " | price: " + Shop.potion75.getPrice() + " gold");
+                System.out.println("3. " + shop.POTION_75_LP.toUpperCase() + " | price: " + shop.potion75.getPrice() + " gold");
             }
         } else {
             if (itemType == WEAPON) {
@@ -1097,17 +1096,17 @@ public class Game {
         System.out.print("Choose a number to buy an item:");
     }
 
-    public static void showPlayerLPAndGold(Player player) {
+    public void showPlayerLPAndGold(Player player) {
         System.out.println("You have: " + player.gold + " gold | " + player.lifePoints + " life points");
         System.out.println("-----------------------------------------------------------");
     }
 
-    public static void showPlayerLPGoldDamageAndArmorPoints(Player player) {
+    public void showPlayerLPGoldDamageAndArmorPoints(Player player) {
         System.out.println("You have: " + player.gold + " gold | " + player.lifePoints + " life points | " + player.damagePoints + " damage points | " + player.armorPoints + " armor points");
         System.out.println("-----------------------------------------------------------");
     }
 
-    public static void showInventoryItemAction(Item item) {
+    public void showInventoryItemAction(Item item) {
         System.out.println("\n---------------------------" + item.getName().toUpperCase() + "---------------------------");
         if (item.type == POTION) {
             System.out.println("1. USE");
@@ -1122,7 +1121,7 @@ public class Game {
         System.out.print("Choose a number to make an action with an item:");
     }
 
-    public static void showStartMenu() {
+    public void showStartMenu() {
 
         System.out.println("\n------------------------START MENU-------------------------");
         System.out.println("1. START GAME");
@@ -1135,7 +1134,7 @@ public class Game {
         System.out.print("Choose a number/letter from a START MENU:");
     }
 
-    public static void showMapsOptions() {
+    public void showMapsOptions() {
         System.out.println("\n----------------------------MAPS---------------------------");
         for (int i = 0; i < maps.size(); i++) {
             System.out.println(i + ". " + maps.get(i).getName().toUpperCase());
@@ -1147,7 +1146,7 @@ public class Game {
         System.out.print("Choose a number to select a map:");
     }
 
-    public static void showLevelsOptions() {
+    public void showLevelsOptions() {
         System.out.println("---------------------------LEVELS--------------------------");
         System.out.println("1. EASY");
         System.out.println("2. MEDIUM");
@@ -1159,7 +1158,7 @@ public class Game {
         System.out.print("Choose a number to select a difficulty level: ");
     }
 
-    public static void showGameMenu() {
+    public void showGameMenu() {
         System.out.println("\n-------------------------GAME MENU-------------------------");
         System.out.println("1. LOCATIONS");
         System.out.println("2. INVENTORY");
@@ -1175,7 +1174,7 @@ public class Game {
     }
 
     // HANDLE EXCEPTIONS
-    public static char readUserInputChar() {
+    public char readUserInputChar() {
         char userInput = Character.toUpperCase(SCANNER.next().charAt(0));
         SCANNER.nextLine();
 
@@ -1183,21 +1182,21 @@ public class Game {
     }
 
     // HANDLE EXCEPTIONS
-    public static String readUserInputString() {
+    public String readUserInputString() {
         String userInput = SCANNER.nextLine().toUpperCase();
 
         return userInput;
     }
 
     // HANDLE EXCEPTIONS
-    public static int readUserInputInt() {
+    public int readUserInputInt() {
         int userInput = SCANNER.nextInt();
         SCANNER.nextLine();
 
         return userInput;
     }
 
-    public static void importMapFromExcel() {
+    public void importMapFromExcel() {
         try {
             FileInputStream file = new FileInputStream(new File(FILE_NAME_MAP));
             XSSFWorkbook workbook = new XSSFWorkbook(file);
@@ -1240,7 +1239,6 @@ public class Game {
                                 newLocation = new Location(cellLocationName.getStringCellValue());
                                 maps.get(j).locations.add(newLocation);
                             }
-                            //break; // ar reikia?
                         }
                     }
 
@@ -1259,7 +1257,7 @@ public class Game {
         }
     }
 
-    public static void exportPlayerHighScoreToExcel(Player player) throws IOException {
+    public void exportPlayerHighScoreToExcel(Player player) throws IOException {
         try {
             FileInputStream file = new FileInputStream(new File(FILE_NAME_PLAYERS_SCORES));
 
@@ -1289,7 +1287,7 @@ public class Game {
         }
     }
 
-    public static List<Player> getPlayersScoresFromExcel() {
+    public List<Player> getPlayersScoresFromExcel() {
         List<Player> playersScoresList = new ArrayList<>();
         Player player;
 
@@ -1319,7 +1317,7 @@ public class Game {
     }
 }
 
-    /*public static void exportMapsAndLocationsToExcel() {
+    /*public void exportMapsAndLocationsToExcel() {
         XSSFWorkbook workbook = new XSSFWorkbook();
 
         XSSFSheet sheet = workbook.createSheet("Maps");
@@ -1349,4 +1347,5 @@ public class Game {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }*/
+    }
+}*/

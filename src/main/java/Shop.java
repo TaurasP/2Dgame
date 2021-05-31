@@ -2,28 +2,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Shop {
-    public static List<Item> weaponsListInShop = new ArrayList<>();
-    public static List<Item> armorListInShop = new ArrayList<>();
-    public static List<Item> potionsListInShop = new ArrayList<>();
+    public List<Item> weaponsListInShop = new ArrayList<>();
+    public List<Item> armorListInShop = new ArrayList<>();
+    public List<Item> potionsListInShop = new ArrayList<>();
 
-    public static final String POTION_25_LP = "25 life points";
-    public static final String POTION_50_LP = "50 life points";
-    public static final String POTION_75_LP = "75 life points";
+    public final String POTION_25_LP = "25 life points";
+    public final String POTION_50_LP = "50 life points";
+    public final String POTION_75_LP = "75 life points";
 
-    public static Weapon dagger = new Weapon("Dagger", 50, 20);
-    public static Weapon knife = new Weapon("Knife", 100, 25);
-    public static Weapon axe = new Weapon("Axe", 200, 45);
-    public static Weapon hammer = new Weapon("Hammer", 300, 95);
-    public static Weapon bow = new Weapon("Bow", 100, 25);
-    public static Weapon longBow = new Weapon("Long Bow", 150, 30);
+    public Weapon dagger = new Weapon("Dagger", 50, 20);
+    public Weapon knife = new Weapon("Knife", 100, 25);
+    public Weapon axe = new Weapon("Axe", 200, 45);
+    public Weapon hammer = new Weapon("Hammer", 300, 95);
+    public Weapon bow = new Weapon("Bow", 100, 25);
+    public Weapon longBow = new Weapon("Long Bow", 150, 30);
 
-    public static Armor woodenShield = new Armor("Wooden Shield", 50, 5);
-    public static Armor ironShield = new Armor("Iron Shield", 100, 10);
-    public static Armor bigShield = new Armor("Big Shield", 200, 20);
+    public Armor woodenShield = new Armor("Wooden Shield", 50, 5);
+    public Armor ironShield = new Armor("Iron Shield", 100, 10);
+    public Armor bigShield = new Armor("Big Shield", 200, 20);
 
-    public static Potion potion25 = new Potion(POTION_25_LP, 25, 25);
-    public static Potion potion50 = new Potion(POTION_50_LP, 50, 50);
-    public static Potion potion75 = new Potion(POTION_75_LP, 75, 75);
+    public Potion potion25 = new Potion(POTION_25_LP, 25, 25);
+    public Potion potion50 = new Potion(POTION_50_LP, 50, 50);
+    public Potion potion75 = new Potion(POTION_75_LP, 75, 75);
 
     public Shop() {
         int numberOfPotions = 100;
