@@ -10,7 +10,8 @@ public class Player extends BaseCharacter {
     public static List<Item> potionsList = new ArrayList<>();
 
     public static int enemiesKilledCounter;
-    public int highScore = 50;
+    public static int locationsClearedCounter;
+    public int highScore = 0;
     public static int baseDamagePoints = 5;
 
     public Player() {
@@ -21,6 +22,7 @@ public class Player extends BaseCharacter {
         boolean isAlive = true;
         gold = 100; // pagal lygi padaryti skirtinga gold kieki?
         enemiesKilledCounter = 0;
+        locationsClearedCounter = 0;
     }
 
     public Player(String name) {
@@ -32,6 +34,7 @@ public class Player extends BaseCharacter {
         boolean isAlive = true;
         gold = 100; // pagal lygi padaryti skirtinga gold kieki?
         enemiesKilledCounter = 0;
+        locationsClearedCounter = 0;
     }
 
     public GameMap getMap() {

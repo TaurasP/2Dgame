@@ -1,12 +1,8 @@
-import com.webfirmframework.wffweb.css.css3.AlignContent;
 import com.webfirmframework.wffweb.tag.html.Body;
 import com.webfirmframework.wffweb.tag.html.H1;
 import com.webfirmframework.wffweb.tag.html.Html;
 import com.webfirmframework.wffweb.tag.html.P;
-import com.webfirmframework.wffweb.tag.html.attribute.global.Id;
 import com.webfirmframework.wffweb.tag.html.attribute.global.Style;
-import com.webfirmframework.wffweb.tag.html.attributewff.CustomAttribute;
-import com.webfirmframework.wffweb.tag.html.html5.attribute.global.Hidden;
 import com.webfirmframework.wffweb.tag.html.metainfo.Head;
 import com.webfirmframework.wffweb.tag.html.stylesandsemantics.Div;
 import com.webfirmframework.wffweb.tag.html.tables.*;
@@ -25,8 +21,8 @@ import java.util.List;
 public class Game {
 
     static final String FILE_NAME_MAP = "Map.xlsx";
-    static final String FILE_NAME_PLAYERS_HIGH_SCORES = "Highscores.xlsx";
-    static final String HTML_PLAYERS_HIGH_SCORES = "top100.html";
+    static final String FILE_NAME_PLAYERS_SCORES = "Scores.xlsx";
+    static final String FILE_NAME_PLAYERS_HIGH_SCORES = "top100.html";
     private static final Scanner SCANNER = new Scanner(System.in);
     public static final String WEAPON = "Weapon";
     public static final String ARMOR = "Armor";
@@ -42,6 +38,8 @@ public class Game {
 
     public static Achievement achievement1KilledEnemy = new Achievement("Your 1st killed enemy.");
     public static Achievement achievement5KilledEnemies = new Achievement("5 enemies killed.");
+    public static Achievement achievement10KilledEnemies = new Achievement("10 enemies killed.");
+    public static Achievement achievement1LocationCleared = new Achievement("Your 1st cleared location.");
 
     public static List<GameMap> maps = new ArrayList<>();
 
@@ -88,16 +86,11 @@ public class Game {
         //map2.locations.add(location4);
     }
 
-    public static void start(Player player) throws IOException {
-        player.achievementsList.add(achievement1KilledEnemy);
-        player.achievementsList.add(achievement5KilledEnemies);
-
+    public static void start(Player player, Game game) throws IOException {
         boolean exit = false;
 
-        showStartMenu();
-
         while (!exit) {
-
+            showStartMenu();
             switch (readUserInputChar()) {
                 case '1':
                     // START GAME
@@ -108,32 +101,39 @@ public class Game {
                     selectToCreateOrImportMap();
                     break;
                 case '3':
-                    // HIGH SCORES - in progress, not finished
-                    exportPlayersHighScoreToExcel(player);
-                    showHighScoresOnWeb(sortHighScoreList(getTop100HighScoresFromExcel()));
+                    // HIGH SCORES
+                    exportPlayersHighScoresToHTML(sortHighScoreList(getPlayersScoresFromExcel()));
+                    openPlayersHighScoresHTML();
                     break;
                 case 'E':
                     exit = true;
                     break;
                 default:
                     System.out.println("\nSelected number/letter does not exist.");
-                    showStartMenu();
                     break;
+
             }
         }
     }
+
     // BUBBLE SORT ALGORITHM (DESCENDING)
     public static List<Player> sortHighScoreList(List<Player> highScoreList) {
-        int num, i, j, temp;
+        String tempName;
+        int num, i, j, tempHighScore;
         num = highScoreList.size();
 
         for (i = 0; i < num; i++) {
             for (i = 0; i < (num - 1); i++) {
                 for (j = 0; j < num - i - 1; j++) {
                     if (highScoreList.get(j).getHighScore() < highScoreList.get(j + 1).getHighScore()) {
-                        temp = highScoreList.get(j).getHighScore();
+                        tempHighScore = highScoreList.get(j).getHighScore();
+                        tempName = highScoreList.get(j).getName();
+
                         highScoreList.get(j).setHighScore(highScoreList.get(j + 1).getHighScore());
-                        highScoreList.get(j + 1).setHighScore(temp);
+                        highScoreList.get(j).setName(highScoreList.get(j + 1).getName());
+
+                        highScoreList.get(j + 1).setHighScore(tempHighScore);
+                        highScoreList.get(j + 1).setName(tempName);
                     }
                 }
             }
@@ -149,36 +149,32 @@ public class Game {
         return highScoreList;
     }
 
-    // BUBBLE SORT ALGORITHM (ASCENDING)
-    /*public static List<Player> sortHighScoreList(List<Player> highScoreList) {
-        int n = highScoreList.size();
-        int k;
-        for (int m = n; m >= 0; m--) {
-            for (int i = 0; i < n - 1; i++) {
-                k = i + 1;
-                if (highScoreList.get(i).getHighScore() > highScoreList.get(k).getHighScore()) {
-                    swapNumbers(i, k, highScoreList);
-                }
-            }
+    public static void checkIfPlayerEarnedAchievement(Player player) {
+        if (player.enemiesKilledCounter == 1) {
+            player.achievementsList.add(achievement1KilledEnemy);
+            showAchievement(achievement1KilledEnemy);
         }
-
-        *//*System.out.println("\n---------------------------HIGH SCORES---------------------------");
-        int id = 1;
-        for (Player i : highScoreList) {
-            System.out.println(id + ". " + i.getName() + ": " + i.getHighScore() + " points.");
-            id++;
-        }*//*
-        return highScoreList;
+        if (player.enemiesKilledCounter == 5) {
+            player.achievementsList.add(achievement5KilledEnemies);
+            showAchievement(achievement5KilledEnemies);
+        }
+        if (player.enemiesKilledCounter == 10) {
+            player.achievementsList.add(achievement10KilledEnemies);
+            showAchievement(achievement10KilledEnemies);
+        }
+        if(player.locationsClearedCounter == 1) {
+            player.achievementsList.add(achievement1LocationCleared);
+            showAchievement(achievement1LocationCleared);
+        }
     }
 
-    private static void swapNumbers(int i, int j, List<Player> highScoreList) {
-        int temp;
-        temp = highScoreList.get(i).getHighScore();
-        highScoreList.get(i).setHighScore(highScoreList.get(j).getHighScore());
-        highScoreList.get(j).setHighScore(temp);
-    }*/
+    public static void showAchievement(Achievement achievement) {
+        System.out.println("\n----------------------NEW ACHIEVEMENT----------------------");
+        System.out.println(achievement.getName().toUpperCase());
+        System.out.println("-----------------------------------------------------------");
+    }
 
-    public static void showHighScoresOnWeb(List<Player> playersHighScoreList) throws IOException {
+    public static void exportPlayersHighScoresToHTML(List<Player> playersHighScoreList) throws IOException {
 
         final Style style3 = new Style("border: 1px solid black;");
 
@@ -191,6 +187,11 @@ public class Game {
             new Body(html).give(body -> {
                 new NoTag(body, " ");
                 new Div(body).give(div -> {
+                    new H1(div,
+                            new Style("text-align:center;padding: 10px;")).give(h1 -> {
+                        new NoTag(h1, "High scores");
+                    });
+                    new NoTag(div, " ");
                     new NoTag(div, " ");
                     new Table(div,
                             new Style("table-layout: fixed;width: 50%;border-collapse: collapse;   border: 1px solid black; margin-left: auto;   margin-right: auto;")).give(table -> {
@@ -255,13 +256,8 @@ public class Game {
             });
         });
 
-        /*Contact tech-support@webfirmframework.com for any help.
-         */
-
-        File newHtmlFile = new File(HTML_PLAYERS_HIGH_SCORES);
+        File newHtmlFile = new File(FILE_NAME_PLAYERS_HIGH_SCORES);
         FileUtils.writeStringToFile(newHtmlFile, rootTag.toHtmlString());
-
-        showStartMenu();
     }
 
     private static void selectMap(Player player) throws IOException {
@@ -272,13 +268,18 @@ public class Game {
         userInput = readUserInputString();
 
         for (int i = 0; i < maps.size(); i++) {
-            if (userInput.equalsIgnoreCase("B")) {
-                selectLevel(player);
-            } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
+            if (userInput.equalsIgnoreCase(String.valueOf(i))) {
                 player.setMap(maps.get(i));
                 selectLevel(player);
                 isFound = true;
             }
+            /*if (userInput.equalsIgnoreCase("B")) {
+                resetGame(player);
+            } else if (userInput.equalsIgnoreCase(String.valueOf(i))) {
+                player.setMap(maps.get(i));
+                selectLevel(player);
+                isFound = true;
+            }*/
         }
         if (!isFound) {
             System.out.println("\nSelected number/letter does not exist.");
@@ -351,12 +352,14 @@ public class Game {
                 enterPlayerName(player);
                 //showGameMenu();
                 break;
-            case 'B':
+            /*case 'B':
+                // REMOVE previously selected MAP for PLAYER
+                player = null;
                 selectMap(player);
                 break;
             case 'M':
-                showStartMenu();
-                break;
+                resetGame(player);
+                break;*/
             default:
                 System.out.println("\nSelected number/letter does not exist.");
                 selectLevel(player);
@@ -388,18 +391,38 @@ public class Game {
                 break;
             case '4':
                 showAchievements(player);
+                selectFromGameMenu(player);
                 break;
-            case 'M':
-                showStartMenu();
+            case '5':
+                exportPlayersHighScoresToHTML(sortHighScoreList(getPlayersScoresFromExcel()));
+                openPlayersHighScoresHTML();
+                selectFromGameMenu(player);
                 break;
-            /*case 'E':
-                exit = true;
-                break;*/
+            case 'R':
+                //restartGame(player);
+                break;
+            case 'E':
+                System.exit(0);
+                break;
             default:
                 System.out.println("\nSelected number/letter does not exist.");
                 selectFromGameMenu(player);
                 break;
         }
+    }
+
+    public static void restartGame(Player player){
+        /*for (int i = 0; i < maps.size(); i++) {
+            if (maps.get(i).getName().equalsIgnoreCase(player.gameMap.getName())) {
+                for (int j = 0; j < player.gameMap.locations.size(); j++) {
+                    player.gameMap.locations.get(j).enemies = null;
+                }
+
+            }
+        }
+        player.gameMap.locations = null;*/
+        player.gameMap = new GameMap("");
+        player = null;
     }
 
     private static void selectLocation(Player player) throws IOException {
@@ -425,6 +448,7 @@ public class Game {
         if (!isSelected) {
             System.out.println("\nSelected number/letter does not exist.");
             selectLocation(player);
+
         }
     }
 
@@ -780,6 +804,7 @@ public class Game {
     }
 
     public static void attack(Player player, int selectedEnemyIndex) {
+        int hits = 0;
         Enemy enemy = player.getMap().getLastLocation().enemies.get(selectedEnemyIndex);
 
         if (enemy.isAlive) {
@@ -788,36 +813,44 @@ public class Game {
             if (player.lifePoints > enemy.damagePoints) {
                 enemy.lifePoints = enemy.lifePoints - player.damagePoints;
                 player.lifePoints = player.lifePoints + player.armorPoints - enemy.damagePoints;
-
-                /*if (enemy.lifePoints > 0) {
-                    System.out.println(enemy.type + " has " + enemy.lifePoints + " life points left.");
-                    System.out.println("You have " + player.lifePoints + " life points left.");
-                }*/
+                hits++;
 
                 if (enemy.lifePoints <= 0) {
-                    System.out.println(enemy.type + " has 0 life points left. He is dead.");
-                    enemy.isAlive = false;
+                    //System.out.println(enemy.type + " has 0 life points left. He is dead.");
                     player.enemiesKilledCounter++;
                     player.gold += 10;
+                    scorePlayer(player, hits);
+                    enemy.isAlive = false;
 
                     player.getMap().getLastLocation().enemies.remove(selectedEnemyIndex);
-                    System.out.println("You have " + player.lifePoints + " life points left.");
-                    checkAchievements(player);
 
                     if (player.getMap().getLastLocation().enemies.isEmpty()) {
                         for (int i = 0; i < player.getMap().locations.size(); i++) {
 
                             if (player.getMap().getLastLocation() == player.getMap().locations.get(i)) {
+                                player.gold += 50;
+                                player.locationsClearedCounter++;
                                 player.getMap().locations.remove(i);
                             }
                         }
                     }
                 }
+                checkIfPlayerEarnedAchievement(player);
             } else {
                 System.out.println("You cannot attack selected enemy. You have not enough life points.");
             }
         } else {
             System.out.println(player.type + " is already dead. You cannot attack.");
+        }
+    }
+
+    public static void scorePlayer(Player player, int hits) {
+        if(hits == 1) {
+            player.setHighScore(player.getHighScore() + 100);
+        } else if(hits == 2) {
+            player.setHighScore(player.getHighScore() + 50);
+        } else {
+            player.setHighScore(player.getHighScore() + 25);
         }
     }
 
@@ -835,52 +868,72 @@ public class Game {
     }
 
     private static void showLocations(Player player) throws IOException {
-        System.out.println("\n--------------------------LOCATIONS--------------------------");
+        System.out.println("\n-------------------------LOCATIONS-------------------------");
         showPlayerLPAndGold(player);
         if (player.getMap().locations.size() > 0) {
             for (int i = 0; i < player.getMap().locations.size(); i++) {
                 System.out.println(i + ". " + player.getMap().locations.get(i).getName().toUpperCase());
             }
-            System.out.println("-------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------");
             System.out.println("B. BACK");
-            System.out.println("-------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------");
+            System.out.print("Choose a number to select a location:");
         } else {
+            System.out.println("All locations are clear. No more enemies left.");
             congratulatePlayer(player);
-            // need to edit main while engine, export startmenu to separate method
-            showStartMenu();
+            System.exit(0);
         }
     }
 
     public static void congratulatePlayer(Player player) throws IOException {
-        System.out.println("All locations are clear. No more enemies left.");
-        System.out.println("Congratulations! You won the game!");
-        // Give achievement or increment some flag to earn achievement later
-        // Save data, think of scoring system, put player to high score leaderboard, reset his life points, gold, weapons, armor, potions. Anything else?
+        System.out.println("\n--------------------------WINNER---------------------------");
+
+        System.out.println("Congratulations! You have won the game!");
+        System.out.println("-----------------------------------------------------------");
         // Create picture from symbols or animation from symbols
 
-        player.setHighScore(100);
-        exportPlayersHighScoreToExcel(player);
-        showHighScoresOnWeb(sortHighScoreList(getTop100HighScoresFromExcel()));
-        // reset player data after he wins - debug it
+        exportPlayerHighScoreToExcel(player);
+        exportPlayersHighScoresToHTML(sortHighScoreList(getPlayersScoresFromExcel()));
+        openPlayersHighScoresHTML();
+    }
+
+    public static void openPlayersHighScoresHTML() {
+        try {
+            File file = new File(FILE_NAME_PLAYERS_HIGH_SCORES);
+            if(!Desktop.isDesktopSupported())
+            {
+                System.out.println("Your system is not supported");
+                return;
+            }
+            Desktop desktop = Desktop.getDesktop();
+            if(file.exists())
+                desktop.open(file);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void showAchievements(Player player) throws IOException {
-        System.out.println("\n--------------------------ACHIEVEMENTS--------------------------");
-        for (int i = 0; i < player.achievementsList.size(); i++) {
-            System.out.println(i + 1 + ". " + player.achievementsList.get(i).getName().toUpperCase());
-        }
-        System.out.println("----------------------------------------------------------------");
-        System.out.println("B. BACK");
-        System.out.println("----------------------------------------------------------------");
+        if (player.achievementsList.size() > 0) {
+            System.out.println("\n--------------------------ACHIEVEMENTS--------------------------");
+            for (int i = 0; i < player.achievementsList.size(); i++) {
+                System.out.println(i + 1 + ". " + player.achievementsList.get(i).getName().toUpperCase());
+            }
+            System.out.println("----------------------------------------------------------------");
+            System.out.println("B. BACK");
+            System.out.println("----------------------------------------------------------------");
 
-        switch (readUserInputChar()) {
-            case 'B':
-                selectFromGameMenu(player);
-                break;
-            default:
-                System.out.println("\nSelected number/letter does not exist.");
-                showAchievements(player);
-                break;
+            switch (readUserInputChar()) {
+                case 'B':
+                    selectFromGameMenu(player);
+                    break;
+                default:
+                    System.out.println("\nSelected number/letter does not exist.");
+                    showAchievements(player);
+                    break;
+            }
+        } else {
+            System.out.println("Sorry. So far no achievements earned.");
         }
     }
 
@@ -919,7 +972,7 @@ public class Game {
         System.out.println("B. BACK");
         System.out.println("---------------------------------------------------------------");
 
-        System.out.print("Choose a number to select an item:");
+        System.out.print("Choose a number to select an item category:");
     }
 
     public static void showInventoryItems(Player player, String itemType) throws IOException {
@@ -1070,54 +1123,55 @@ public class Game {
     }
 
     public static void showStartMenu() {
-        System.out.println("\n---------------------------START MENU---------------------------");
+
+        System.out.println("\n------------------------START MENU-------------------------");
         System.out.println("1. START GAME");
         System.out.println("2. CREATE / IMPORT MAP");
-        System.out.println("3. HIGH SCORE");
-        System.out.println("----------------------------------------------------------------");
+        System.out.println("3. HIGH SCORES");
+        System.out.println("-----------------------------------------------------------");
         System.out.println("E. EXIT GAME");
-        System.out.println("----------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------");
 
-        System.out.print("Choose a number/letter:");
+        System.out.print("Choose a number/letter from a START MENU:");
     }
 
     public static void showMapsOptions() {
-        System.out.println("\n----------------------------MAPS----------------------------");
+        System.out.println("\n----------------------------MAPS---------------------------");
         for (int i = 0; i < maps.size(); i++) {
             System.out.println(i + ". " + maps.get(i).getName().toUpperCase());
         }
-        System.out.println("------------------------------------------------------------");
-        System.out.println("B. BACK");
-        System.out.println("------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------");
+        //System.out.println("B. BACK");
+        //System.out.println("-----------------------------------------------------------");
 
         System.out.print("Choose a number to select a map:");
     }
 
     public static void showLevelsOptions() {
-        System.out.println("\n---------------------------LEVELS---------------------------");
+        System.out.println("---------------------------LEVELS--------------------------");
         System.out.println("1. EASY");
         System.out.println("2. MEDIUM");
         System.out.println("3. HARD");
-        System.out.println("------------------------------------------------------------");
-        System.out.println("B. BACK");
-        System.out.println("M. BACK TO START MENU");
-        System.out.println("------------------------------------------------------------");
-
-        System.out.print("Choose a number to select game difficulty level");
+        System.out.println("-----------------------------------------------------------");
+        //System.out.println("B. BACK");
+        //System.out.println("M. BACK TO START MENU");
+        //System.out.println("-----------------------------------------------------------");
+        System.out.print("Choose a number to select a difficulty level: ");
     }
 
     public static void showGameMenu() {
-        System.out.println("\n---------------------------GAME MENU---------------------------");
+        System.out.println("\n-------------------------GAME MENU-------------------------");
         System.out.println("1. LOCATIONS");
         System.out.println("2. INVENTORY");
         System.out.println("3. SHOP");
         System.out.println("4. ACHIEVEMENTS");
-        System.out.println("---------------------------------------------------------------");
-        System.out.println("M. GO TO START MENU");
+        System.out.println("5. HIGH SCORES");
+        System.out.println("-----------------------------------------------------------");
+        System.out.println("R. RESTART");
         System.out.println("E. EXIT GAME");
-        System.out.println("---------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------");
 
-        System.out.print("Choose a number/letter:");
+        System.out.print("Choose a number/letter from a GAME MENU:");
     }
 
     // HANDLE EXCEPTIONS
@@ -1141,19 +1195,6 @@ public class Game {
         SCANNER.nextLine();
 
         return userInput;
-    }
-
-    public static void checkAchievements(Player player) {
-        if (player.enemiesKilledCounter == 1) {
-            System.out.println("\n---------------------------NEW ACHIEVEMENT---------------------------");
-            System.out.println(achievement1KilledEnemy.getName().toUpperCase());
-            System.out.println("---------------------------------------------------------------------");
-        }
-        if (player.enemiesKilledCounter == 5) {
-            System.out.println("\n---------------------------NEW ACHIEVEMENT---------------------------");
-            System.out.println(achievement5KilledEnemies.getName().toUpperCase());
-            System.out.println("---------------------------------------------------------------------");
-        }
     }
 
     public static void importMapFromExcel() {
@@ -1218,63 +1259,42 @@ public class Game {
         }
     }
 
-    // edit code so that players stay after game is closed and not overwritten next time - check for update excel file solutions
-    public static void exportPlayersHighScoreToExcel(Player player) {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-
-        XSSFSheet sheet = workbook.createSheet("High scores");
-
-        int rowCount = 0;
-
-        Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("Place");
-        headerRow.createCell(1).setCellValue("Player");
-        headerRow.createCell(2).setCellValue("Score");
-        List<Player> players = new ArrayList<>();
-        //players.add(player);
-
-        // test data
-        Player player1 = new Player("Petras");
-        player1.setHighScore(100);
-
-        Player player2 = new Player("Jonas");
-        player2.setHighScore(50);
-
-        Player player3 = new Player("Tomas");
-        player3.setHighScore(200);
-
-        players.add(player1);
-        players.add(player2);
-        players.add(player3);
-
-        for (int i = 0; i < players.size(); i++) {
-            Row row = sheet.createRow(++rowCount);
-
-            Cell playerID = row.createCell(0);
-            playerID.setCellValue(i + 1);
-
-            Cell playerName = row.createCell(1);
-            playerName.setCellValue(players.get(i).getName());
-
-            Cell highScore = row.createCell(2);
-            highScore.setCellValue(players.get(i).getHighScore());
-        }
-
+    public static void exportPlayerHighScoreToExcel(Player player) throws IOException {
         try {
-            FileOutputStream out = new FileOutputStream(new File(FILE_NAME_PLAYERS_HIGH_SCORES));
-            workbook.write(out);
-            out.close();
-            System.out.println("Players high scores were successfully exported to " + FILE_NAME_PLAYERS_HIGH_SCORES);
+            FileInputStream file = new FileInputStream(new File(FILE_NAME_PLAYERS_SCORES));
+
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Player");
+            headerRow.createCell(1).setCellValue("Score");
+
+            Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+
+            Cell playerName = row.createCell(0);
+            Cell highScore = row.createCell(1);
+
+            playerName.setCellValue(player.getName());
+            highScore.setCellValue(player.getHighScore());
+
+
+            FileOutputStream fos = new FileOutputStream(new File(FILE_NAME_PLAYERS_SCORES));
+            workbook.write(fos);
+            fos.close();
+            file.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static List<Player> getTop100HighScoresFromExcel() {
-        List<Player> top100HighScoresList = new ArrayList<>();
+    public static List<Player> getPlayersScoresFromExcel() {
+        List<Player> playersScoresList = new ArrayList<>();
+        Player player;
 
         try {
-            FileInputStream file = new FileInputStream(new File(FILE_NAME_PLAYERS_HIGH_SCORES));
+            FileInputStream file = new FileInputStream(new File(FILE_NAME_PLAYERS_SCORES));
 
             XSSFWorkbook workbook = new XSSFWorkbook(file);
 
@@ -1282,122 +1302,22 @@ public class Game {
 
             for (int i = 1; i < sheet.getLastRowNum() + 1; i++) {
                 Row row = sheet.getRow(i);
-                Cell playerName = row.getCell(1);
-                Cell highScore = row.getCell(2);
+                Cell playerName = row.getCell(0);
+                Cell highScore = row.getCell(1);
 
-                Player player = new Player();
+                player = new Player();
                 player.setName(playerName.getStringCellValue());
                 player.setHighScore((int)highScore.getNumericCellValue());
-                top100HighScoresList.add(player);
+                playersScoresList.add(player);
             }
 
             file.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return top100HighScoresList;
+        return playersScoresList;
     }
-
-
-
 }
-    /*public static void importMapsFromExcel(){
-        try {
-            List<String> tempMapsNamesListFromExcel = new ArrayList<>();
-            List<String> tempLocationsNamesListFromExcel = new ArrayList<>();
-
-            List<String> tempMapsNamesListFromGame = new ArrayList<>();
-            List<String> tempLocationsNamesListFromGame = new ArrayList<>();
-
-            //Map<String, String> tempMapsAndLocations = new HashMap<>();
-
-            FileInputStream file = new FileInputStream(new File(FILE_NAME));
-
-            XSSFWorkbook workbook = new XSSFWorkbook(file);
-
-            XSSFSheet sheet = workbook.getSheetAt(0);
-
-            int lastRowNumber = sheet.getLastRowNum() + 1;
-
-            for (int i = 0; i < maps.size(); i++) {
-                 tempMapsNamesListFromGame.add(maps.get(i).getName());
-            }
-
-            // read MAPS and LOCATIONS from excel
-            for (int i = 1; i < lastRowNumber; i++) {
-                Row row = sheet.getRow(i);
-                Cell cellMap = row.getCell(0);
-                Cell cellLocation = row.getCell(1);
-
-                if (cellMap != null && cellLocation != null) {
-                    tempMapsNamesListFromExcel.add(cellMap.getStringCellValue());
-                    tempLocationsNamesListFromExcel.add(cellLocation.getStringCellValue());
-                    //tempMapsAndLocations.put(cellMap.getStringCellValue(), cellLocation.getStringCellValue());
-                }
-            }
-
-            for(String s : tempMapsNamesListFromGame) {
-                System.out.println(s);
-            }
-
-            //tempMapsAndLocations.forEach((key, value) -> System.out.println(key + " " + value));
-
-
-            *//*for(String s : tempMapsList) {
-                System.out.println(s);
-            }
-
-            for(String s : tempLocationsList) {
-                System.out.println(s);
-            }*//*
-
-
-            //boolean isCreated = false;
-            // ITERATE MAPS FROM EXCEL
-            *//*for (int i = 0; i < tempMapsList.size(); i++) {
-
-                // ITERATE MAPS
-                for (int j = 0; j < maps.size(); j++) {
-
-                    // IF MAP ALREADY EXISTS
-                    if (tempMapsList.contains(maps.get(j))) {
-                        System.out.println(tempMapsList.get(i) + " exists");
-
-                        // ITERATE LOCATIONS FROM EXCEL
-                        for (int k = 0; k < tempLocationsList.size(); k++) {
-
-                            // ITERATE LOCATIONS
-                            for (int l = 0; l < maps.get(j).locations.size(); l++) {
-                                // IF LOCATION EXISTS
-                                *//**//*if (tempLocationsList.get(l).equalsIgnoreCase(maps.get(j).locations.get(k).getName())) {
-                                    System.out.println(tempLocationsList.get(l) + " exists");
-                                }*//**//*
-                            }
-                        }
-                        //else {
-                        // IF LOCATION DOESN'T EXIST
-                        //System.out.println(tempLocationsList.get(j) + " doesn't exist");
-                        //maps.get(i).locations.add(new Location(tempLocationsList.get(j)));
-                        //}
-                        //break;
-                    // IF MAP DOESN'T EXIST
-                    } else {
-                        //System.out.println(tempMapsList.get(i) + " doesn't exist");
-                        //System.out.println(tempLocationsList.get(j) + " doesn't exist");
-
-                        //Map newMap = new Map(tempMapsList.get(i));
-                        //maps.add(newMap);
-
-                        //newMap.locations.add(new Location(cellLocation.getStringCellValue()));
-                    }
-                }
-                //break;
-            }*//*
-            file.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
 
     /*public static void exportMapsAndLocationsToExcel() {
         XSSFWorkbook workbook = new XSSFWorkbook();
