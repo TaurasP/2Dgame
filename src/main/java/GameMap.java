@@ -6,12 +6,14 @@ public class GameMap {
     private Location lastLocation;
     public List<Location> locations;
 
-    public String getName() {
-        return name;
+    public GameMap(String name) {
+        this.name = name;
+        locations = new ArrayList<>();
+        lastLocation = new Location("");
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     public Location getLastLocation() {
@@ -20,11 +22,5 @@ public class GameMap {
 
     public void setLastLocation(Location lastLocation) {
         this.lastLocation = lastLocation;
-    }
-
-    public GameMap(String name) {
-        this.name = name;
-        locations = new ArrayList<>();
-        lastLocation = new Location("");
     }
 }

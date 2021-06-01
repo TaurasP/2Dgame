@@ -23,6 +23,14 @@ public class BaseCharacter {
         return damagePoints;
     }
 
+    public boolean getIsAlive() {
+        return isAlive;
+    }
+
+    public int getGold() {
+        return gold;
+    }
+
     public void setLifePoints(int lifePoints) {
         this.lifePoints = lifePoints;
     }
@@ -33,5 +41,21 @@ public class BaseCharacter {
 
     public String getName() {
         return name;
+    }
+
+    public void setArmorPoints(int armorPoints) {
+        this.armorPoints = armorPoints;
+    }
+
+    public void setDamagePoints(int damagePoints) {
+        this.damagePoints = damagePoints;
+    }
+
+    public void setIsAlive(boolean alive) {
+        isAlive = alive;
+    }
+
+    public void setGold(int gold) {
+        this.gold = gold;
     }
 }

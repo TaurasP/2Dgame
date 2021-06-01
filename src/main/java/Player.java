@@ -20,7 +20,7 @@ public class Player extends BaseCharacter {
         armorPoints = 0;
         damagePoints = baseDamagePoints;
         boolean isAlive = true;
-        gold = 100; // pagal lygi padaryti skirtinga gold kieki?
+        gold = 100;
         enemiesKilledCounter = 0;
         locationsClearedCounter = 0;
     }
@@ -32,7 +32,7 @@ public class Player extends BaseCharacter {
         armorPoints = 0;
         damagePoints = 0;
         boolean isAlive = true;
-        gold = 100; // pagal lygi padaryti skirtinga gold kieki?
+        gold = 100;
         enemiesKilledCounter = 0;
         locationsClearedCounter = 0;
     }

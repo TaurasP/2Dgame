@@ -49,4 +49,16 @@ public class Shop {
             potionsListInShop.add(potion75);
         }
     }
+
+    public Potion getPotion25() {
+        return potion25;
+    }
+
+    public Potion getPotion50() {
+        return potion50;
+    }
+
+    public Potion getPotion75() {
+        return potion75;
+    }
 }

@@ -19,10 +19,6 @@ public class Item {
         return price;
     }
 
-    public boolean isEquipped(boolean b) {
-        return isEquipped;
-    }
-
     public int getDamage() {
         return damage;
     }
@@ -35,7 +31,11 @@ public class Item {
         return lifePoints;
     }
 
-    public void setEquipped(boolean equipped) {
+    public void setIsEquipped(boolean equipped) {
         isEquipped = equipped;
+    }
+
+    public boolean getIsEquipped() {
+        return isEquipped;
     }
 }
