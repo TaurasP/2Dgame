@@ -1,4 +1,4 @@
-public class Item {
+abstract class Item {
     String name;
     String type;
     int price;
@@ -7,35 +7,19 @@ public class Item {
     int armor;
     int lifePoints;
 
-    public String getName() {
-        return name;
-    }
+    abstract String getName();
 
-    public String getType() {
-        return type;
-    }
+    abstract String getType();
 
-    public int getPrice() {
-        return price;
-    }
+    abstract int getPrice();
 
-    public int getDamage() {
-        return damage;
-    }
+    abstract int getDamage();
 
-    public int getArmor() {
-        return armor;
-    }
+    abstract int getArmor();
 
-    public int getLifePoints() {
-        return lifePoints;
-    }
+    abstract int getLifePoints();
 
-    public void setIsEquipped(boolean equipped) {
-        isEquipped = equipped;
-    }
+    abstract void setIsEquipped(boolean equipped);
 
-    public boolean getIsEquipped() {
-        return isEquipped;
-    }
+    abstract boolean getIsEquipped();
 }

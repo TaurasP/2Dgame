@@ -1,4 +1,4 @@
-public class BaseCharacter {
+abstract class BaseCharacter {
     String type;
     int lifePoints;
     int armorPoints;
@@ -7,55 +7,29 @@ public class BaseCharacter {
     String name;
     int gold = 0;
 
-    public String getType() {
-        return type;
-    }
+    abstract String getType();
 
-    public int getLifePoints() {
-        return lifePoints;
-    }
+    abstract int getLifePoints();
 
-    public int getArmorPoints() {
-        return armorPoints;
-    }
+    abstract int getArmorPoints();
 
-    public int getDamagePoints() {
-        return damagePoints;
-    }
+    abstract int getDamagePoints();
 
-    public boolean getIsAlive() {
-        return isAlive;
-    }
+    abstract boolean getIsAlive();
 
-    public int getGold() {
-        return gold;
-    }
+    abstract int getGold();
 
-    public void setLifePoints(int lifePoints) {
-        this.lifePoints = lifePoints;
-    }
+    abstract void setLifePoints(int lifePoints);
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    abstract void setName(String name);
 
-    public String getName() {
-        return name;
-    }
+    abstract String getName();
 
-    public void setArmorPoints(int armorPoints) {
-        this.armorPoints = armorPoints;
-    }
+    abstract void setArmorPoints(int armorPoints);
 
-    public void setDamagePoints(int damagePoints) {
-        this.damagePoints = damagePoints;
-    }
+    abstract void setDamagePoints(int damagePoints);
 
-    public void setIsAlive(boolean alive) {
-        isAlive = alive;
-    }
+    abstract void setIsAlive(boolean alive);
 
-    public void setGold(int gold) {
-        this.gold = gold;
-    }
+    abstract void setGold(int gold);
 }
